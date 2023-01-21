@@ -15,7 +15,7 @@ jobs:
       - name: Init new repo in root folder and commit generated files
         run: |
           git init
-          git add -A
+          git add -A -f
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit -m 'deploy'
