@@ -10,6 +10,14 @@
       --wall-color: rgba(0, 0, 255, 0.28);
     }
 
+    .status {
+      margin: 8px auto;
+    }
+
+    .status > .speed {
+      text-align: center;
+    }
+
     .canvas {
       border: var(--block-size) solid var(--wall-color);
       box-sizing: content-box;
@@ -62,6 +70,9 @@
 </head>
 <body>
 <h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
+<div class="status">
+  <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
+</div>
 <div class="canvas"></div>
 
 <script type="module">
@@ -71,20 +82,24 @@
   import {GameUI} from "./js/modules/GameUI.mjs";
   import {Speed} from "./js/modules/Speed.mjs";
 
-  const width = 1200; //640;
-  const height = 960; //480;
+  const width = 960;
+  const height = 680;
   const block = 10;
   const row = height / block;
   const col = width / block;
 
   const initialPosition = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const canvas = document.querySelector('div.canvas');
+  const speedValue = document.querySelector('div.status>div.speed>strong');
   const gameUI = new GameUI(canvas, width, height);
   const grid = new Grid(row, col, block, gameUI);
-  const speed = new Speed(50, 16);
+  const speed = new Speed(125, 25);
   const snake = new Snake(initialPosition, grid);
   const game = new Game(grid, snake, gameUI, speed);
-  game.setLevel(1);
+
+  speed.onBroadcast((delay) => {
+    speedValue.innerHTML = Number(1000 / delay).toPrecision(2);
+  })
 
   window.onload = () => game.run();
   window.onkeydown = (e) => {

@@ -25,11 +25,26 @@ export class Speed {
     return this.#current;
   }
 
+  /**
+   * @param {Number} delay
+   * @returns {void}
+   */
+  #callback = (delay) => {};
+
+  /**
+   * @param {Function} fn
+   */
+  onBroadcast(fn) {
+    this.#callback = fn;
+  }
+
   increase() {
     const increase = MathUtils.percent(this.#current, 30);
     if (this.#current - increase > this.#MAX_SPEED) {
       this.#current -= increase;
     } else this.#current = this.#MAX_SPEED;
+    // Broadcast callback
+    if (this.#callback) this.#callback(this.#current)
   }
 
   decrease() {
@@ -37,6 +52,8 @@ export class Speed {
     if (this.#current + decrease < this.#MIN_SPEED) {
       this.#current += decrease;
     } else this.#current = this.#MIN_SPEED;
+    // Broadcast callback
+    if (this.#callback) this.#callback(this.#current)
   }
 
   reset() {

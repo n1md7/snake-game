@@ -56,7 +56,17 @@ export class Snake {
 
   /** @returns {{row: Number, col: Number}} */
   #nextIndex() {
-    const {row, col} = this.#grid.get2dIdx(this.#blockHeadIdx);
+    const direction = this.#direction.peek();
+    let {row, col} = this.#grid.get2dIdx(this.#blockHeadIdx);
+
+    {
+      // Allow to teleport between the edges
+      if (direction === Direction.Type.Left && col === 0) col = this.#grid.col;
+      if (direction === Direction.Type.Right && col === this.#grid.col - 1) col = -1;
+      if (direction === Direction.Type.Up && row === 0) row = this.#grid.row;
+      if (direction === Direction.Type.Down && row === this.#grid.row - 1) row = -1;
+    }
+
     const move = {
       Left: {row, col: col - 1},
       Right: {row, col: col + 1},
@@ -64,7 +74,7 @@ export class Snake {
       Down: {row: row + 1, col},
     };
 
-    return move[this.#direction.peek()];
+    return move[direction];
   }
 
   /** @param {Direction.Type} direction */
