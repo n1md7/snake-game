@@ -4,8 +4,6 @@ export class Speed {
   #MAX_SPEED = 32;
   #MIN_SPEED = 300;
   /** @type {Number} */
-  #default;
-  /** @type {Number} */
   #current;
 
   /**
@@ -42,6 +40,6 @@ export class Speed {
   }
 
   reset() {
-    this.#current = this.#default;
+    this.#current = this.#MAX_SPEED;
   }
 }
