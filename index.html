@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <style>
+    :root {
+      --block-size: 20px;
+      --wall-color: rgba(0, 0, 255, 0.28);
+    }
+
+    .canvas {
+      border: var(--block-size) solid var(--wall-color);
+      box-sizing: content-box;
+      margin: 24px auto;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .canvas > .block {
+      border: 1px solid rgba(0, 0, 0, 0.21);
+      font-size: 8px;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.18);
+      vertical-align: middle;
+    }
+
+    .canvas > .block.wall {
+      background-color: var(--wall-color);
+      color: transparent;
+    }
+
+    .canvas > .block.food {
+      background-color: #523e02;
+    }
+
+    .canvas > .block.empty {
+      transition: 100ms all;
+      background-color: white;
+    }
+
+    .canvas > .block.body {
+      background-color: black;
+    }
+
+    .canvas > .block.body.head {
+      background-color: rgba(119, 44, 44, 0.51);
+      color: transparent;
+      animation: blink 100ms infinite;
+    }
+
+    @keyframes blink {
+      0% {
+        background-color: rgba(59, 20, 20, 0.46);
+      }
+      100% {
+        background-color: rgba(0, 0, 0, 0.58);
+      }
+    }
+  </style>
+</head>
+<body>
+<h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
+<div class="canvas"></div>
+
+<script type="module">
+  import {Grid} from "./js/modules/Grid.mjs";
+  import {Snake} from "./js/modules/Snake.mjs";
+  import {Game} from "./js/modules/Game.mjs";
+  import {GameUI} from "./js/modules/GameUI.mjs";
+  import {Speed} from "./js/modules/Speed.mjs";
+
+  const width = 1200; //640;
+  const height = 960; //480;
+  const block = 10;
+  const row = height / block;
+  const col = width / block;
+
+  const initialPosition = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const canvas = document.querySelector('div.canvas');
+  const gameUI = new GameUI(canvas, width, height);
+  const grid = new Grid(row, col, block, gameUI);
+  const speed = new Speed(50, 16);
+  const snake = new Snake(initialPosition, grid);
+  const game = new Game(grid, snake, gameUI, speed);
+  game.setLevel(1);
+
+  window.onload = () => game.run();
+  window.onkeydown = (e) => {
+    if (['ArrowLeft', 'KeyA'].includes(e.code)) snake.goLeft();
+    if (['ArrowRight', 'KeyD'].includes(e.code)) snake.goRight();
+    if (['ArrowDown', 'KeyS'].includes(e.code)) snake.goDown();
+    if (['ArrowUp', 'KeyW'].includes(e.code)) snake.goUp();
+    if (['KeyR'].includes(e.code)) {
+      game.reset();
+      game.run();
+    }
+    if (['Space'].includes(e.code)) snake.increaseSpeed();
+  };
+  window.onkeyup = (e) => {
+    if (['Space'].includes(e.code)) snake.decreaseSpeed();
+  };
+
+</script>
+</body>
+</html>
