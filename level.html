@@ -163,6 +163,7 @@
       if (Levels[idx]) {
         for (const linearId of Levels[idx]) {
           grid.getBlockByLinearId(linearId).updateAsBody();
+          dots.add(linearId);
         }
       }
     },
