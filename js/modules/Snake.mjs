@@ -134,7 +134,7 @@ export class Snake {
     const [tailIndex] = this.#blocks;
     this.#blocks.delete(tailIndex);
     const block = this.#grid.getBlockByLinearId(tailIndex);
-    block.updateAsEmpty();
+    if(block) block.updateAsEmpty();
   }
 
   appendHead() {

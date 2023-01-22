@@ -74,7 +74,8 @@
   <div class="status">
     <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
     <div class="point">Points: <strong>0</strong> <span class="text-muted" title="Points">PTS</span></div>
-    <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span></div>
+    <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span>
+    </div>
   </div>
   <div class="canvas"></div>
 </div>
@@ -87,6 +88,7 @@
   import {Speed} from "./js/modules/Speed.mjs";
   import {Food} from "./js/modules/Food.mjs";
   import {Point} from "./js/modules/Point.mjs";
+  import {Bot} from "./js/modules/Bot.mjs";
 
   const width = 960;
   const height = 480;
@@ -105,15 +107,24 @@
   const grid = new Grid(row, col, block, gameUI);
   const speed = new Speed(125, 25);
   const snake = new Snake(initialPosition, grid);
+  const bots = [
+    new Bot(grid, 10 * 96),
+    new Bot(grid, 20 * 96),
+    new Bot(grid, 30 * 96),
+    new Bot(grid, 40 * 96)
+  ];
   const food = new Food(grid, snake);
   const point = new Point(0);
-  const game = new Game(grid, snake, gameUI, speed, food, point);
+  const game = new Game(grid, snake, gameUI, speed, food, point, bots);
 
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   point.onBroadcast((point) => pointValue.innerHTML = point);
   snake.onBroadcast((length) => lengthValue.innerHTML = length);
 
-  window.onload = () => game.run();
+  window.onload = () => {
+    game.run();
+    bots.map(bot => bot.run());
+  };
   window.onkeydown = (e) => {
     if (['ArrowLeft', 'KeyA'].includes(e.code)) snake.goLeft();
     if (['ArrowRight', 'KeyD'].includes(e.code)) snake.goRight();

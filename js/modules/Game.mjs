@@ -19,6 +19,8 @@ export class Game {
   #grid;
   /** @type {Snake} */
   #snake;
+  /** @type {Snake[]} */
+  #bots;
   /** @type {GameUI} */
   #canvas;
   /** @type {Speed} */
@@ -35,8 +37,9 @@ export class Game {
    * @param {Speed} speed
    * @param {Food} food
    * @param {Point} point
+   * @param {Snake[]} bots
    */
-  constructor(grid, snake, canvas, speed, food, point) {
+  constructor(grid, snake, canvas, speed, food, point, bots) {
     this.#grid = grid;
     this.#snake = snake;
     this.#canvas = canvas;
@@ -46,6 +49,7 @@ export class Game {
     this.#lastUpdate = 0;
     this.#food = food;
     this.#point = point;
+    this.#bots = bots;
   }
 
   get isEnded() {
@@ -103,7 +107,7 @@ export class Game {
   /**
    * @param {Number} [currentTick = 0]
    */
-  #loop(currentTick= 0) {
+  #loop(currentTick = 0) {
     const delta = currentTick - this.#lastTick;
     if (delta > this.#interval) {
       this.#lastTick = currentTick;
@@ -116,7 +120,7 @@ export class Game {
   /**
    * @description Initial update, runs only once per start/reset.
    */
-  #updateOnce(){
+  #updateOnce() {
     this.#food.generate();
   }
 
@@ -140,15 +144,15 @@ export class Game {
     }
   }
 
-  #handleSnakeSpeed(){
-    if(this.#snake.accelerateRequested) {
+  #handleSnakeSpeed() {
+    if (this.#snake.accelerateRequested) {
       return this.#speed.increase();
     }
     this.#speed.decrease();
   }
 
-  #handleSnakeEatFood(){
-    if(this.#snake.headId === this.#food.id) {
+  #handleSnakeEatFood() {
+    if (this.#snake.headId === this.#food.id) {
       // 🐍 eats 🍔
       this.#food.generate();
       this.#point.increment();
@@ -156,11 +160,13 @@ export class Game {
     }
   }
 
-  #handleSnakeRender(){
-    this.#snake.removeTail();
-    this.#snake.appendHead();
-    for (const block of this.#snake) {
-      block.updateAsBody();
+  #handleSnakeRender() {
+    for (const snake of [this.#snake, ...this.#bots]) {
+      snake.removeTail();
+      snake.appendHead();
+      for (const block of snake) {
+        block.updateAsBody();
+      }
     }
   }
 
