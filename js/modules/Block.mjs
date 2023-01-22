@@ -23,7 +23,7 @@ export class Block {
   /**
    * @param {GameUI} gameUI
    * @param {Number} blockWH
-   * @param {Block.type} type
+   * @param {Block.type} [type = Block.type.Empty]
    *
    * @returns Block
    */
@@ -65,6 +65,11 @@ export class Block {
 
   updateAsBody() {
     this.setType(Block.type.Body);
+    this.update();
+  }
+
+  updateAsFood() {
+    this.setType(Block.type.Food);
     this.update();
   }
 

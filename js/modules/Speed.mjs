@@ -5,6 +5,11 @@ export class Speed {
   #MIN_SPEED = 300;
   /** @type {Number} */
   #current;
+  /**
+   * @param {Number} delay
+   * @returns {void}
+   */
+  #callback;
 
   /**
    * Specify default min and max delays.
@@ -26,12 +31,6 @@ export class Speed {
   }
 
   /**
-   * @param {Number} delay
-   * @returns {void}
-   */
-  #callback = (delay) => {};
-
-  /**
    * @param {Function} fn
    */
   onBroadcast(fn) {
@@ -44,7 +43,7 @@ export class Speed {
       this.#current -= increase;
     } else this.#current = this.#MAX_SPEED;
     // Broadcast callback
-    if (this.#callback) this.#callback(this.#current)
+    if (typeof this.#callback === 'function') this.#callback(this.#current);
   }
 
   decrease() {
@@ -53,7 +52,7 @@ export class Speed {
       this.#current += decrease;
     } else this.#current = this.#MIN_SPEED;
     // Broadcast callback
-    if (this.#callback) this.#callback(this.#current)
+    if (typeof this.#callback === 'function') this.#callback(this.#current);
   }
 
   reset() {

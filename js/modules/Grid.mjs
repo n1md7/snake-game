@@ -36,7 +36,7 @@ export class Grid extends GridUtils {
   }
 
   #updateGridWithBlocks() {
-    const levelBlocks = this.#getLevel();
+    const levelBlocks = this.getLevelBlocks();
     for (const [rowIdx, row] of this.#grid.entries()) {
       for (const colIdx of row.keys()) {
         const block = new Block(this.#gameUI, this.#block);
@@ -50,7 +50,7 @@ export class Grid extends GridUtils {
     }
   }
 
-  #getLevel() {
+  getLevelBlocks() {
     if (this.#level === 1) return Levels.Level01;
     if (this.#level === 2) return Levels.Level02;
     if (this.#level === 3) return Levels.Level03;

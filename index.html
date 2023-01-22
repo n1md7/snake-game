@@ -11,15 +11,14 @@
     }
 
     .status {
+      width: 1000px;
       margin: 8px auto;
-    }
-
-    .status > .speed {
-      text-align: center;
+      display: flex;
+      justify-content: space-evenly;
     }
 
     .canvas {
-      border: var(--block-size) solid var(--wall-color);
+      border: var(--block-size) solid rgba(90, 134, 20, 0.3);
       box-sizing: content-box;
       margin: 24px auto;
       display: flex;
@@ -41,6 +40,7 @@
 
     .canvas > .block.food {
       background-color: #523e02;
+      animation: blink 100ms infinite;
     }
 
     .canvas > .block.empty {
@@ -69,11 +69,15 @@
   </style>
 </head>
 <body>
-<h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
-<div class="status">
-  <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
+<div class="container-fluid">
+  <h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
+  <div class="status">
+    <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
+    <div class="point">Points: <strong>0</strong> <span class="text-muted" title="Points">PTS</span></div>
+    <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span></div>
+  </div>
+  <div class="canvas"></div>
 </div>
-<div class="canvas"></div>
 
 <script type="module">
   import {Grid} from "./js/modules/Grid.mjs";
@@ -81,9 +85,11 @@
   import {Game} from "./js/modules/Game.mjs";
   import {GameUI} from "./js/modules/GameUI.mjs";
   import {Speed} from "./js/modules/Speed.mjs";
+  import {Food} from "./js/modules/Food.mjs";
+  import {Point} from "./js/modules/Point.mjs";
 
   const width = 960;
-  const height = 680;
+  const height = 480;
   const block = 10;
   const row = height / block;
   const col = width / block;
@@ -91,15 +97,21 @@
   const initialPosition = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const canvas = document.querySelector('div.canvas');
   const speedValue = document.querySelector('div.status>div.speed>strong');
+  const pointValue = document.querySelector('div.status>div.point>strong');
+  const lengthValue = document.querySelector('div.status>div.length>strong');
+  lengthValue.innerHTML = initialPosition.length.toString();
+
   const gameUI = new GameUI(canvas, width, height);
   const grid = new Grid(row, col, block, gameUI);
   const speed = new Speed(125, 25);
   const snake = new Snake(initialPosition, grid);
-  const game = new Game(grid, snake, gameUI, speed);
+  const food = new Food(grid, snake);
+  const point = new Point(0);
+  const game = new Game(grid, snake, gameUI, speed, food, point);
 
-  speed.onBroadcast((delay) => {
-    speedValue.innerHTML = Number(1000 / delay).toPrecision(2);
-  })
+  speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
+  point.onBroadcast((point) => pointValue.innerHTML = point);
+  snake.onBroadcast((length) => lengthValue.innerHTML = length);
 
   window.onload = () => game.run();
   window.onkeydown = (e) => {

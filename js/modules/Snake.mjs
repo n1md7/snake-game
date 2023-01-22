@@ -26,6 +26,13 @@ export class Snake {
   #status = Snake.Status.Active;
   /** @type {Boolean} */
   #accelerate = false;
+  /** @type {Number} */
+  #snacksToDigest = 0;
+  /**
+   * @param {Number} delay
+   * @returns {void}
+   */
+  #callback;
 
   /**
    * @param {Number[]} blocks
@@ -36,6 +43,14 @@ export class Snake {
     this.#initialBlocks = Array.from(blocks);
 
     this.reset();
+  }
+
+  get headId() {
+    return this.#blockHeadIdx;
+  }
+
+  get blocks() {
+    return this.#blocks;
   }
 
   get status() {
@@ -52,6 +67,14 @@ export class Snake {
 
   decreaseSpeed() {
     this.#accelerate = false;
+  }
+
+  /**
+   * @param {Number} [weight = 1] - Food weight, 1 = 1 Block
+   */
+  addTailBlock(weight){
+    this.#snacksToDigest += weight;
+    if (typeof this.#callback === 'function') this.#callback(this.#blocks.size + weight);
   }
 
   /** @returns {{row: Number, col: Number}} */
@@ -105,6 +128,8 @@ export class Snake {
   }
 
   removeTail() {
+    // Do not remove Snake block while snacks in the stomach 🤪
+    if(this.#snacksToDigest > 0) return this.#snacksToDigest --;
     // Get and remove 1st item from set of Blocks
     const [tailIndex] = this.#blocks;
     this.#blocks.delete(tailIndex);
@@ -121,7 +146,7 @@ export class Snake {
     this.#blockHeadRef.setIsHead(false);
     this.#blockHeadRef = this.#grid.getBlockByLinearId(linearIdx);
     this.#blockHeadRef.setIsHead(true);
-    this.#direction.removeLast()
+    this.#direction.removeLast();
   }
 
   /** @returns {boolean} */
@@ -139,11 +164,19 @@ export class Snake {
     return !(nextBlock.isBody() || nextBlock.isWall());
   }
 
+  /**
+   * @param {Function} fn
+   */
+  onBroadcast(fn) {
+    this.#callback = fn;
+  }
+
   reset() {
     this.#blocks = new Set(this.#initialBlocks);
     this.#blockHeadIdx = this.#initialBlocks.at(-1);
     this.#blockHeadRef = this.#grid.getBlockByLinearId(this.#blockHeadIdx);
     this.#direction = new Direction();
     this.#accelerate = false;
+    if (typeof this.#callback === 'function') this.#callback(this.#blocks.size);
   }
 }

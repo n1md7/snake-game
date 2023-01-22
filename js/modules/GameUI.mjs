@@ -41,6 +41,6 @@ export class GameUI {
   }
 
   reset() {
-    this.#canvas.style.borderColor = 'rgba(0, 0, 255, 0.28)';
+    this.#canvas.style.borderColor = 'rgba(90, 134, 20, 0.3)';
   }
 }

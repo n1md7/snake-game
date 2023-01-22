@@ -1,3 +1,5 @@
+import {Food} from "./Food.mjs";
+
 export class Game {
   /** @type {Number} */
   #fps = 60;
@@ -21,14 +23,20 @@ export class Game {
   #canvas;
   /** @type {Speed} */
   #speed;
+  /** @type {Food} */
+  #food;
+  /** @type {Point} */
+  #point;
 
   /**
    * @param {Grid} grid
    * @param {Snake} snake
    * @param {GameUI} canvas
    * @param {Speed} speed
+   * @param {Food} food
+   * @param {Point} point
    */
-  constructor(grid, snake, canvas, speed) {
+  constructor(grid, snake, canvas, speed, food, point) {
     this.#grid = grid;
     this.#snake = snake;
     this.#canvas = canvas;
@@ -36,6 +44,8 @@ export class Game {
     this.#interval = 1000 / this.#fps;
     this.#lastTick = 0;
     this.#lastUpdate = 0;
+    this.#food = food;
+    this.#point = point;
   }
 
   get isEnded() {
@@ -86,13 +96,14 @@ export class Game {
   }
 
   run() {
-    this.#loop(0);
+    this.#updateOnce();
+    this.#loop();
   }
 
   /**
-   * @param {Number} currentTick
+   * @param {Number} [currentTick = 0]
    */
-  #loop(currentTick) {
+  #loop(currentTick= 0) {
     const delta = currentTick - this.#lastTick;
     if (delta > this.#interval) {
       this.#lastTick = currentTick;
@@ -100,6 +111,13 @@ export class Game {
     }
 
     window.requestAnimationFrame(this.#loop.bind(this));
+  }
+
+  /**
+   * @description Initial update, runs only once per start/reset.
+   */
+  #updateOnce(){
+    this.#food.generate();
   }
 
   /**
@@ -116,14 +134,33 @@ export class Game {
         return true; // Signal to Exit
       }
 
-      this.#snake.accelerateRequested ?
-        this.#speed.increase() : this.#speed.decrease();
+      this.#handleSnakeSpeed();
+      this.#handleSnakeEatFood();
+      this.#handleSnakeRender();
+    }
+  }
 
-      this.#snake.removeTail();
-      this.#snake.appendHead();
-      for (const block of this.#snake) {
-        block.updateAsBody();
-      }
+  #handleSnakeSpeed(){
+    if(this.#snake.accelerateRequested) {
+      return this.#speed.increase();
+    }
+    this.#speed.decrease();
+  }
+
+  #handleSnakeEatFood(){
+    if(this.#snake.headId === this.#food.id) {
+      // 🐍 eats 🍔
+      this.#food.generate();
+      this.#point.increment();
+      this.#snake.addTailBlock();
+    }
+  }
+
+  #handleSnakeRender(){
+    this.#snake.removeTail();
+    this.#snake.appendHead();
+    for (const block of this.#snake) {
+      block.updateAsBody();
     }
   }
 

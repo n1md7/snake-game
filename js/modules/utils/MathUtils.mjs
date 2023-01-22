@@ -5,7 +5,22 @@ export class MathUtils {
    * @param {Number} to
    */
   static getRandomInt(from, to) {
-    return Math.random() * (to - from) + from;
+    from = Math.ceil(from);
+    to = Math.floor(to);
+    return Math.floor(Math.random() * (to - from + 1)) + from;
+  }
+
+  /**
+   * @description Gets random integer between the range (inclusive) excluding specified Set
+   * @param {Number} from
+   * @param {Number} to
+   * @param {Set<Number>} excluded
+   */
+  static getRandomWithoutExcluded(from, to, excluded) {
+    while (true) {
+      const random = MathUtils.getRandomInt(from, to);
+      if (!excluded.has(random)) return random;
+    }
   }
 
   /**
@@ -22,7 +37,7 @@ export class MathUtils {
    * @param {Number} value
    * @param {Number} percent
    */
-  static percent(value, percent){
+  static percent(value, percent) {
     return value * percent / 100;
   }
 }
