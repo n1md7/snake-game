@@ -52,12 +52,6 @@
       background-color: black;
     }
 
-    .canvas > .block.body.head {
-      background-color: rgba(119, 44, 44, 0.51);
-      color: transparent;
-      animation: blink 100ms infinite;
-    }
-
     .canvas > .block.bump {
       background-color: red;
     }
@@ -118,16 +112,16 @@
   const gameUI = new GameUI(canvas, width, height);
   const grid = new Grid(row, col, block, gameUI);
   const speed = new Speed(125, 25);
-  const snake = new Snake(initialPosition, grid);
+  const snake = new Snake(initialPosition, grid, speed, 'rgba(232,13,13,0.29)');
   const bots = [
-    new Bot(grid, 10 * 96),
-    new Bot(grid, 20 * 96),
-    new Bot(grid, 30 * 96),
-    new Bot(grid, 40 * 96)
+    new Bot(grid, 10 * 96, new Speed(250, 25), 'rgba(4,135,152,0.62)'),
+    new Bot(grid, 20 * 96, new Speed(300, 35), 'rgba(131,117,31,0.5)'),
+    new Bot(grid, 30 * 96, new Speed(350, 45), 'rgba(98,30,92,0.4)'),
+    new Bot(grid, 40 * 96, new Speed(400, 55), 'rgba(203,12,28,0.34)')
   ];
   const food = new Food(grid, snake);
   const point = new Point(0);
-  const game = new Game(grid, snake, gameUI, speed, food, point, bots);
+  const game = new Game(grid, snake, gameUI, food, point, bots);
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   point.onBroadcast((point) => pointValue.innerHTML = point);
   snake.onBroadcast((length) => lengthValue.innerHTML = length);
@@ -151,6 +145,7 @@
     if (['Space'].includes(e.code)) snake.decreaseSpeed();
   };
 
+  // Populate Level select-box
   for (const idx of Levels.keys()) {
     const option = document.createElement('option');
     option.value = String(idx);

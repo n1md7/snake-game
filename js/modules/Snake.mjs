@@ -18,6 +18,8 @@ export class Snake {
   #direction = null;
   /** @type {Grid} */
   #grid = null;
+  /** @type {Speed} */
+  #speed = null;
   /** @type {Number} */
   #blockHeadIdx;
   /** @type {Block} */
@@ -33,16 +35,33 @@ export class Snake {
    * @returns {void}
    */
   #callback;
+  /** @type {Number} - determines when to tick next */
+  #lastUpdate;
+  /** @type {String} - Head color */
+  #color;
 
   /**
    * @param {Number[]} blocks
    * @param {Grid} grid
+   * @param {Speed} speed
+   * @param {String} color
    */
-  constructor(blocks, grid) {
+  constructor(blocks, grid, speed, color) {
     this.#grid = grid;
+    this.#speed = speed;
     this.#initialBlocks = Array.from(blocks);
+    this.#lastUpdate = 0;
+    this.#color = color;
 
     this.reset();
+  }
+
+  get color() {
+    return this.#color;
+  }
+
+  get speed() {
+    return this.#speed;
   }
 
   get headId() {
@@ -59,6 +78,17 @@ export class Snake {
 
   get accelerateRequested() {
     return this.#accelerate;
+  }
+
+  /** @param {Number} currentTick */
+  needsUpdate(currentTick) {
+    const delta = currentTick - this.#lastUpdate;
+    if (delta > this.speed.current) {
+      this.#lastUpdate = currentTick;
+      return true;
+    }
+
+    return false;
   }
 
   increaseSpeed() {
@@ -146,6 +176,7 @@ export class Snake {
     this.#blockHeadRef.setIsHead(false);
     this.#blockHeadRef = this.#grid.getBlockByLinearId(linearIdx);
     this.#blockHeadRef.setIsHead(true);
+    this.#blockHeadRef.setBackgroundColor(this.#color);
     this.#direction.removeLast();
   }
 
@@ -185,6 +216,7 @@ export class Snake {
     this.#blockHeadRef = this.#grid.getBlockByLinearId(this.#blockHeadIdx);
     this.#direction = new Direction();
     this.#accelerate = false;
+    this.#speed.reset();
     if (typeof this.#callback === 'function') this.#callback(this.#blocks.size);
   }
 }

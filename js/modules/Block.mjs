@@ -24,6 +24,10 @@ export class Block {
   #isHead = false;
   /** @type {Number} */
   #blockWH = 10;
+  /** @type {String} */
+  #color;
+  /** @type {Boolean} */
+  #colorHasApplied = false;
 
   /**
    * @param {GameUI} gameUI
@@ -63,6 +67,12 @@ export class Block {
   /** @param {Number} index */
   setIndex(index) {
     this.#index = index;
+  }
+
+  /** @param {String} color */
+  setBackgroundColor(color) {
+    this.#color = color;
+    this.#colorHasApplied = false;
   }
 
   /** @param {Boolean} state */
@@ -110,11 +120,17 @@ export class Block {
     // this.#block.innerText = this.#index;
     if (this.#isHead) this.#block.classList.add(Block.type.Head);
 
+    if(this.#colorHasApplied) this.#block.style.removeProperty('background-color');
+    if(this.#color && !this.#colorHasApplied) {
+      this.#block.style.setProperty('background-color', this.#color);
+      this.#color = null;
+      this.#colorHasApplied = true;
+    }
+
     if (this.#type === Block.type.Empty) this.#block.classList.add(Block.type.Empty);
-    else if (this.#type === Block.type.Body) this.#block.classList.add(Block.type.Body);
     else if (this.#type === Block.type.Wall) this.#block.classList.add(Block.type.Wall);
     else if (this.#type === Block.type.Food) this.#block.classList.add(Block.type.Food);
-
+    else if (this.#type === Block.type.Body) this.#block.classList.add(Block.type.Body);
     if (this.#extraType === Block.extraType.Bump) return this.#block.classList.add(Block.extraType.Bump);
   }
 

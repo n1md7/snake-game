@@ -6,8 +6,6 @@ export class Game {
   /** @type {Number} */
   #lastTick;
   /** @type {Number} */
-  #lastUpdate;
-  /** @type {Number} */
   #interval;
   /** @type {Boolean} */
   #ended = false;
@@ -23,8 +21,6 @@ export class Game {
   #bots;
   /** @type {GameUI} */
   #canvas;
-  /** @type {Speed} */
-  #speed;
   /** @type {Food} */
   #food;
   /** @type {Point} */
@@ -34,19 +30,16 @@ export class Game {
    * @param {Grid} grid
    * @param {Snake} snake
    * @param {GameUI} canvas
-   * @param {Speed} speed
    * @param {Food} food
    * @param {Point} point
    * @param {Snake[]} bots
    */
-  constructor(grid, snake, canvas, speed, food, point, bots) {
+  constructor(grid, snake, canvas, food, point, bots) {
     this.#grid = grid;
     this.#snake = snake;
     this.#canvas = canvas;
-    this.#speed = speed;
     this.#interval = 1000 / this.#fps;
     this.#lastTick = 0;
-    this.#lastUpdate = 0;
     this.#food = food;
     this.#point = point;
     this.#bots = bots;
@@ -89,7 +82,6 @@ export class Game {
     this.#grid.reset();
     this.#snake.reset();
     this.#canvas.reset();
-    this.#speed.reset();
   }
 
   /**
@@ -124,49 +116,50 @@ export class Game {
     this.#food.generate();
   }
 
-  /**
-   * @param {Number} currentTick
-   */
+  /** @param {Number} currentTick */
   #update(currentTick) {
-    const delta = currentTick - this.#lastUpdate;
-    if (delta > this.#speed.current) {
-      this.#lastUpdate = currentTick;
-      if (!this.#snake.canMove()) this.setLost();
-      if (this.#ended) {
-        if (this.#won) this.#handleGameWon();
-        if (this.#lost) this.#handleGameLost();
-        return true; // Signal to Exit
-      }
-
-      this.#handleSnakeSpeed();
-      this.#handleSnakeEatFood();
-      this.#handleSnakeRender();
-    }
-  }
-
-  #handleSnakeSpeed() {
-    if (this.#snake.accelerateRequested) {
-      return this.#speed.increase();
-    }
-    this.#speed.decrease();
-  }
-
-  #handleSnakeEatFood() {
-    if (this.#snake.headId === this.#food.id) {
-      // 🐍 eats 🍔
-      this.#food.generate();
-      this.#point.increment();
-      this.#snake.addTailBlock();
-    }
-  }
-
-  #handleSnakeRender() {
     for (const snake of [this.#snake, ...this.#bots]) {
-      snake.removeTail();
-      snake.appendHead();
-      for (const block of snake) {
-        block.updateAsBody();
+      if (snake.needsUpdate(currentTick)) {
+        if (!this.#snake.canMove()) this.setLost();
+        if (this.#ended) {
+          if (this.#won) this.#handleGameWon();
+          if (this.#lost) this.#handleGameLost();
+          return true; // Signal to Exit
+        }
+
+        this.#handleSnakeSpeed(snake);
+        this.#handleSnakeEatFood(snake);
+        this.#handleSnakeRender(snake);
       }
+    }
+  }
+
+  /** @param {Snake} snake */
+  #handleSnakeSpeed(snake) {
+    if (snake.accelerateRequested) {
+      return snake.speed.increase();
+    }
+    snake.speed.decrease();
+  }
+
+  /** @param {Snake} snake */
+  #handleSnakeEatFood(snake) {
+    if (this.#food.ids.has(snake.headId)) {
+      // 🐍 eats 🍔
+      this.#food.ids.delete(snake.headId);
+      this.#food.generate(2);
+      // FIXME point is shared, should be bound with snakes
+      this.#point.increment();
+      snake.addTailBlock();
+    }
+  }
+
+  /** @param {Snake} snake */
+  #handleSnakeRender(snake) {
+    snake.removeTail();
+    snake.appendHead();
+    for (const block of snake) {
+      block.updateAsBody();
     }
   }
 
@@ -174,7 +167,7 @@ export class Game {
     console.log('You LOST', 'cause:', this.#snake.status);
     this.#canvas.showLooser();
     const nextBlock = this.#snake.nextBlock();
-    if(nextBlock) nextBlock.updateAsBump();
+    if (nextBlock) nextBlock.updateAsBump();
   }
 
   #handleGameWon() {
