@@ -15,6 +15,7 @@ export class Bot extends Snake {
   }
 
   run() {
+    if(this.blocks.size <= 1) this.stop();
     const random = MathUtils.getRandomInt(0, 3);
     if (random === 0) this.goUp();
     if (random === 1) this.goDown();
