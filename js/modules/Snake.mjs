@@ -72,7 +72,7 @@ export class Snake {
   /**
    * @param {Number} [weight = 1] - Food weight, 1 = 1 Block
    */
-  addTailBlock(weight){
+  addTailBlock(weight = 1){
     this.#snacksToDigest += weight;
     if (typeof this.#callback === 'function') this.#callback(this.#blocks.size + weight);
   }
