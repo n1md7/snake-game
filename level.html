@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Level</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <style>
+    :root {
+      --block-size: 20px;
+      --wall-color: rgba(0, 0, 255, 0.28);
+    }
+
+    .clipboard, .action, .levels {
+      width: 1000px;
+      margin: 8px auto;
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    .action, .levels {
+      justify-content: center;
+    }
+
+    .canvas {
+      border: var(--block-size) solid rgba(90, 134, 20, 0.3);
+      box-sizing: content-box;
+      margin: 24px auto;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .canvas > .block {
+      border: 1px solid rgba(0, 0, 0, 0.21);
+      font-size: 8px;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.18);
+      vertical-align: middle;
+    }
+
+    .canvas > .block.wall {
+      background-color: var(--wall-color);
+      color: transparent;
+    }
+
+    .canvas > .block.food {
+      background-color: #523e02;
+      animation: blink 100ms infinite;
+    }
+
+    .canvas > .block.empty {
+      transition: 100ms all;
+      background-color: white;
+    }
+
+    .canvas > .block.body {
+      background-color: black;
+    }
+
+    .canvas > .block.body.head {
+      background-color: rgba(119, 44, 44, 0.51);
+      color: transparent;
+      animation: blink 100ms infinite;
+    }
+
+    @keyframes blink {
+      0% {
+        background-color: rgba(59, 20, 20, 0.46);
+      }
+      100% {
+        background-color: rgba(0, 0, 0, 0.58);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
+  <div class="action">
+    <button class="btn-primary btn copy mx-1">Copy</button>
+    <div class="mx-4">
+      <button class="btn-outline-warning btn remove mr-1">Remove</button>
+      <button class="btn-outline-primary btn add" disabled="">Add</button>
+    </div>
+    <button class="btn-outline-danger btn clear mx-1">Clear All</button>
+    <button class="btn-outline-warning btn undo mx-1">Undo</button>
+  </div>
+  <div class="levels">
+    <label>
+      <select name="level">
+        <option value="">Choose</option>
+      </select>
+    </label>
+  </div>
+  <div class="clipboard">
+    <label>
+      <textarea cols="100" rows="5"></textarea>
+    </label>
+  </div>
+  <div class="canvas"></div>
+</div>
+
+<script type="module">
+  import {Grid} from "./js/modules/Grid.mjs";
+  import {GameUI} from "./js/modules/GameUI.mjs";
+  import {Levels} from "./js/modules/Levels.mjs";
+
+  const width = 960;
+  const height = 480;
+  const block = 10;
+  const row = height / block;
+  const col = width / block;
+
+  const canvas = document.querySelector('div.canvas');
+  const clipboard = document.querySelector('div textarea');
+  const copy = document.querySelector('div button.copy');
+  const remove = document.querySelector('div button.remove');
+  const clear = document.querySelector('div button.clear');
+  const undo = document.querySelector('div button.undo');
+  const add = document.querySelector('div button.add');
+  const levels = document.querySelector('div .levels select');
+  const gameUI = new GameUI(canvas, width, height);
+  const grid = new Grid(row, col, block, gameUI);
+  const dots = new Set();
+  const history = [];
+
+  for (const idx of Levels.keys()) {
+    const option = document.createElement('option');
+    option.value = String(idx);
+    option.innerText = `Level ${String(idx).padStart(2, '0')}`;
+    levels.appendChild(option);
+  }
+
+  const action = {
+    active: false,
+    add: true,
+    remove: false,
+    doClearAll() {
+      canvas.querySelectorAll('.block').forEach(block => {
+        grid.getBlockByLinearId(+block.dataset.idx)?.updateAsEmpty();
+      });
+      dots.clear();
+      history.length = 0;
+    },
+    doAdd() {
+      this.add = true;
+      this.remove = false;
+      add.setAttribute('disabled', '');
+      remove.removeAttribute('disabled');
+    },
+    doRemove() {
+      this.add = false;
+      this.remove = true;
+      add.removeAttribute('disabled');
+      remove.setAttribute('disabled', '');
+    },
+    doCopy() {
+      clipboard.value = [...dots.values()].join();
+      clipboard.select();
+      navigator.clipboard.writeText(clipboard.value);
+    },
+    renderLevel(target) {
+      const idx = +target.value;
+      if (Levels[idx]) {
+        for (const linearId of Levels[idx]) {
+          grid.getBlockByLinearId(linearId).updateAsBody();
+        }
+      }
+    },
+    doUndo() {
+      const {added = null, removed = null} = history.pop();
+      if (added !== null) {
+        dots.delete(added);
+        grid.getBlockByLinearId(added).updateAsEmpty();
+      } else if (removed !== null) {
+        dots.delete(removed);
+        grid.getBlockByLinearId(removed).updateAsFood();
+      }
+    }
+  };
+  levels.onchange = ({target}) => action.renderLevel(target)
+  remove.onclick = () => action.doRemove();
+  add.onclick = () => action.doAdd();
+  copy.onclick = () => action.doCopy();
+  clear.onclick = () => action.doClearAll();
+  undo.onclick = () => action.doUndo();
+
+  canvas.onmousedown = () => action.active = true;
+  canvas.onmouseup = ({target}) => {
+    const idx = target.dataset.idx;
+    if (idx) {
+      if (action.add) {
+        dots.add(+idx);
+        history.push({added: +idx});
+        grid.getBlockByLinearId(+idx).updateAsFood();
+      } else if (action.remove) {
+        dots.delete(+idx);
+        history.push({removed: +idx});
+        grid.getBlockByLinearId(+idx).updateAsEmpty();
+      }
+    }
+    action.active = false;
+  };
+  canvas.onmousemove = ({target}) => {
+    if (action.active) {
+      const idx = target.dataset.idx;
+      if (idx) {
+        if (action.add) {
+          dots.add(+idx);
+          history.push({added: +idx});
+          grid.getBlockByLinearId(+idx).updateAsFood();
+        } else if (action.remove) {
+          dots.delete(+idx);
+          history.push({removed: +idx});
+          grid.getBlockByLinearId(+idx).updateAsEmpty();
+        }
+      }
+    }
+  }
+
+</script>
+</body>
+</html>

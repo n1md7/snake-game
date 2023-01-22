@@ -8,7 +8,7 @@ export class Grid extends GridUtils {
   /** @type {GameUI} */
   #gameUI = null;
   /** @type {Number} */
-  #level = 1;
+  #level = 0;
   /** @type {Number} */
   #block = 10;
 
@@ -43,6 +43,7 @@ export class Grid extends GridUtils {
         this.#grid[rowIdx][colIdx] = block;
         const index = this.getLinearIdx(rowIdx, colIdx);
         block.setIndex(index);
+        block.setDataIdx(index);
         if (levelBlocks.has(index)) block.setType(Block.type.Wall);
         else block.setType(Block.type.Empty);
         block.render();
@@ -51,10 +52,8 @@ export class Grid extends GridUtils {
   }
 
   getLevelBlocks() {
-    if (this.#level === 1) return Levels.Level01;
-    if (this.#level === 2) return Levels.Level02;
-    if (this.#level === 3) return Levels.Level03;
-    return Levels.Level03;
+    if (Levels[this.#level]) return Levels[this.#level];
+    return Levels.at(-1);
   }
 
   /** @param {Number} level */
@@ -70,7 +69,7 @@ export class Grid extends GridUtils {
    */
   getBlockByXY(row, col) {
     const block = this.#grid?.[row]?.[col];
-    if(block) return block;
+    if (block) return block;
 
     return this.#grid?.[row]?.[col];
   }

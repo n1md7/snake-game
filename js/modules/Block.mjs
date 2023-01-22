@@ -43,6 +43,13 @@ export class Block {
     this.#block.classList.add('block');
   }
 
+  /**
+   * @param {Number} idx
+   */
+  setDataIdx(idx) {
+    this.#block.setAttribute('data-idx', idx + '');
+  }
+
   /** @param {Block.type} type */
   setType(type) {
     this.#type = type;

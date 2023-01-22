@@ -70,7 +70,14 @@
 </head>
 <body>
 <div class="container-fluid">
-  <h3 class="text-center my-3 text-muted">Snake - 🐍</h3>
+  <h3 class="text-center my-3 text-muted">
+    Snake - 🐍 -
+    <label class="levels">
+      <select name="level">
+        <option value="">Choose Level</option>
+      </select>
+    </label>
+  </h3>
   <div class="status">
     <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
     <div class="point">Points: <strong>0</strong> <span class="text-muted" title="Points">PTS</span></div>
@@ -89,6 +96,7 @@
   import {Food} from "./js/modules/Food.mjs";
   import {Point} from "./js/modules/Point.mjs";
   import {Bot} from "./js/modules/Bot.mjs";
+  import {Levels} from "./js/modules/Levels.mjs";
 
   const width = 960;
   const height = 480;
@@ -96,11 +104,13 @@
   const row = height / block;
   const col = width / block;
 
-  const initialPosition = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const initialPosition = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(a => a + col);
   const canvas = document.querySelector('div.canvas');
   const speedValue = document.querySelector('div.status>div.speed>strong');
   const pointValue = document.querySelector('div.status>div.point>strong');
   const lengthValue = document.querySelector('div.status>div.length>strong');
+  const levels = document.querySelector('div .levels select');
+
   lengthValue.innerHTML = initialPosition.length.toString();
 
   const gameUI = new GameUI(canvas, width, height);
@@ -116,7 +126,6 @@
   const food = new Food(grid, snake);
   const point = new Point(0);
   const game = new Game(grid, snake, gameUI, speed, food, point, bots);
-
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   point.onBroadcast((point) => pointValue.innerHTML = point);
   snake.onBroadcast((length) => lengthValue.innerHTML = length);
@@ -139,6 +148,16 @@
   window.onkeyup = (e) => {
     if (['Space'].includes(e.code)) snake.decreaseSpeed();
   };
+
+  for (const idx of Levels.keys()) {
+    const option = document.createElement('option');
+    option.value = String(idx);
+    option.innerText = `Level ${String(idx).padStart(2, '0')}`;
+    levels.appendChild(option);
+  }
+
+  levels.onchange = ({target}) => game.setLevel(+target.value);
+
 
 </script>
 </body>
