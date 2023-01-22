@@ -72,7 +72,7 @@ export class Snake {
   /**
    * @param {Number} [weight = 1] - Food weight, 1 = 1 Block
    */
-  addTailBlock(weight = 1){
+  addTailBlock(weight = 1) {
     this.#snacksToDigest += weight;
     if (typeof this.#callback === 'function') this.#callback(this.#blocks.size + weight);
   }
@@ -129,12 +129,12 @@ export class Snake {
 
   removeTail() {
     // Do not remove Snake block while snacks in the stomach 🤪
-    if(this.#snacksToDigest > 0) return this.#snacksToDigest --;
+    if (this.#snacksToDigest > 0) return this.#snacksToDigest--;
     // Get and remove 1st item from set of Blocks
     const [tailIndex] = this.#blocks;
     this.#blocks.delete(tailIndex);
     const block = this.#grid.getBlockByLinearId(tailIndex);
-    if(block) block.updateAsEmpty();
+    if (block) block.updateAsEmpty();
   }
 
   appendHead() {
@@ -169,6 +169,14 @@ export class Snake {
    */
   onBroadcast(fn) {
     this.#callback = fn;
+  }
+
+  /**
+   * @returns {Block|null}
+   */
+  nextBlock() {
+    const next = this.#nextIndex();
+    return this.#grid.getBlockByXY(next.row, next.col);
   }
 
   reset() {

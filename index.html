@@ -58,6 +58,10 @@
       animation: blink 100ms infinite;
     }
 
+    .canvas > .block.bump {
+      background-color: red;
+    }
+
     @keyframes blink {
       0% {
         background-color: rgba(59, 20, 20, 0.46);
@@ -72,10 +76,8 @@
 <div class="container-fluid">
   <h3 class="text-center my-3 text-muted">
     Snake - 🐍 -
-    <label class="levels">
-      <select name="level">
-        <option value="">Choose Level</option>
-      </select>
+    <label class="levels"> Level
+      <select name="level"></select>
     </label>
   </h3>
   <div class="status">
@@ -152,11 +154,14 @@
   for (const idx of Levels.keys()) {
     const option = document.createElement('option');
     option.value = String(idx);
-    option.innerText = `Level ${String(idx).padStart(2, '0')}`;
+    option.innerText = `${String(idx + 1).padStart(2, '0')}`;
     levels.appendChild(option);
   }
 
-  levels.onchange = ({target}) => game.setLevel(+target.value);
+  levels.onchange = ({target}) => {
+    game.setLevel(+target.value);
+    Promise.resolve().then(() => levels.blur());
+  };
 
 
 </script>

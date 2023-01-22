@@ -68,9 +68,6 @@ export class Grid extends GridUtils {
    @returns {Block | null}
    */
   getBlockByXY(row, col) {
-    const block = this.#grid?.[row]?.[col];
-    if (block) return block;
-
     return this.#grid?.[row]?.[col];
   }
 

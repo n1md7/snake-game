@@ -6,9 +6,14 @@ export class Block {
     Body: 'body',
     Head: 'head',
   });
+  static extraType = Object.freeze({
+    Bump: 'bump',
+  });
 
   /** @type {Block.type | null} */
   #type = null;
+  /** @type {Block.extraType | null} */
+  #extraType = null;
   /** @type {Number | ''} */
   #index = '';
   /** @type {HTMLElement | null} */
@@ -80,6 +85,11 @@ export class Block {
     this.update();
   }
 
+  updateAsBump() {
+    this.#extraType = Block.extraType.Bump;
+    this.update();
+  }
+
   isBody() {
     return this.#type === Block.type.Body;
   }
@@ -95,13 +105,17 @@ export class Block {
       Block.type.Wall,
       Block.type.Body,
       Block.type.Head,
+      Block.extraType.Bump,
     );
     // this.#block.innerText = this.#index;
     if (this.#isHead) this.#block.classList.add(Block.type.Head);
-    if (this.#type === Block.type.Empty) return this.#block.classList.add(Block.type.Empty);
-    if (this.#type === Block.type.Body) return this.#block.classList.add(Block.type.Body);
-    if (this.#type === Block.type.Wall) return this.#block.classList.add(Block.type.Wall);
-    if (this.#type === Block.type.Food) return this.#block.classList.add(Block.type.Food);
+
+    if (this.#type === Block.type.Empty) this.#block.classList.add(Block.type.Empty);
+    else if (this.#type === Block.type.Body) this.#block.classList.add(Block.type.Body);
+    else if (this.#type === Block.type.Wall) this.#block.classList.add(Block.type.Wall);
+    else if (this.#type === Block.type.Food) this.#block.classList.add(Block.type.Food);
+
+    if (this.#extraType === Block.extraType.Bump) return this.#block.classList.add(Block.extraType.Bump);
   }
 
   render() {

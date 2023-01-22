@@ -173,6 +173,8 @@ export class Game {
   #handleGameLost() {
     console.log('You LOST', 'cause:', this.#snake.status);
     this.#canvas.showLooser();
+    const nextBlock = this.#snake.nextBlock();
+    if(nextBlock) nextBlock.updateAsBump();
   }
 
   #handleGameWon() {
