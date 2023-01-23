@@ -8,6 +8,8 @@ export class Bot extends Snake {
   #timeoutId = -1;
   /** @type {Grid} */
   #grid;
+  /** @type {{col: Number, row: Number, idx: Number} | null} */
+  #targetLocation;
 
   /**
    * @param {Grid} grid
@@ -19,7 +21,7 @@ export class Bot extends Snake {
    */
   constructor(grid, spawnIndex, speed, point, color, name) {
     const rand = MathUtils.getRandomInt(0, 128);
-    const body = MathUtils.numberList(spawnIndex + rand, spawnIndex + rand + 7);
+    const body = MathUtils.numberList(spawnIndex + rand, spawnIndex + rand + 3);
     super(body, grid, speed, point, color, name);
     this.#grid = grid;
   }
@@ -29,25 +31,26 @@ export class Bot extends Snake {
   }
 
   run() {
-    const target = this.find(MathUtils.getRandomInt(6, 20));
-    if (target !== null) {
-      const currentTarget = this.nextIndex();
-      while (target.row !== currentTarget.row && target.col !== currentTarget.col) {
-        if (currentTarget.row > target.row) {
-          currentTarget.row--;
+    this.#targetLocation ||= this.find(16);
+    if(this.#targetLocation !== null) {
+      const current = this.nextIndex();
+      while (this.#targetLocation.row !== current.row && this.#targetLocation.col !== current.col) {
+        if (current.row > this.#targetLocation.row) {
+          current.row--;
           this.goUp();
-        } else if (currentTarget.row < target.row) {
-          currentTarget.row++;
+        } else if (current.row < this.#targetLocation.row) {
+          current.row++;
           this.goDown();
-        } if (currentTarget.col > target.col) {
-          currentTarget.col--;
+        } if (current.col > this.#targetLocation.col) {
+          current.col--;
           this.goLeft();
-        } else if (currentTarget.col < target.col) {
-          currentTarget.col++;
+        } else if (current.col < this.#targetLocation.col) {
+          current.col++;
           this.goRight();
         }
       }
       this.increaseSpeed();
+      this.#targetLocation = null;
     } else {
       this.decreaseSpeed();
       const random = MathUtils.getRandomInt(0, 3);
