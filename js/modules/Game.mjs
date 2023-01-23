@@ -105,6 +105,7 @@ export class Game {
     this.#grid.reset();
     this.#player.reset();
     this.#canvas.reset();
+    this.#bots.forEach(bot => bot.reset());
   }
 
   /** @param {Number} level */
@@ -195,8 +196,8 @@ export class Game {
   }
 
   /** @param {Snake} snake */
-  #removeBodyOf(snake){
-    for(const piece of snake) {
+  #removeBodyOf(snake) {
+    for (const piece of snake) {
       // FIXME, something is odd, not being updated as food
       piece.updateAsFood();
     }
