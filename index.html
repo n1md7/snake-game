@@ -93,6 +93,7 @@
   import {Point} from "./js/modules/Point.mjs";
   import {Bot} from "./js/modules/Bot.mjs";
   import {Levels} from "./js/modules/Levels.mjs";
+  import {MathUtils} from "./js/modules/utils/MathUtils.mjs";
 
   const width = 960;
   const height = 480;
@@ -100,7 +101,7 @@
   const row = height / block;
   const col = width / block;
 
-  const initialPosition = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(a => a + col);
+  const initialPosition = [...MathUtils.getListNumbers(1, 20)].map(a => a + col);
   const canvas = document.querySelector('div.canvas');
   const speedValue = document.querySelector('div.status>div.speed>strong');
   const pointValue = document.querySelector('div.status>div.point>strong');

@@ -134,11 +134,7 @@ export class Game {
   /** @param {Number} currentTick */
   #update(currentTick) {
     for (const snake of [this.#player, ...this.#bots]) {
-      if (snake.isDisabled) {
-        this.#turnFleshIntoFood(snake);
-        // Skip over dead bodies
-        continue;
-      }
+      if (snake.isDisabled) return this.#turnFleshIntoFood(snake);
       if (this.#pointToWin === snake.points.point) this.setWon(snake);
       if (snake.needsUpdate(currentTick)) {
         if (!snake.canMove()) this.setLost(snake);
@@ -166,11 +162,11 @@ export class Game {
   /** @param {Snake} snake */
   #handleSnakeEatFood(snake) {
     if (this.#food.ids.has(snake.headId)) {
-      this.#handleSnakeEatsBotFlesh(snake.headId);
       this.#food.ids.delete(snake.headId);
       this.#food.generate(MathUtils.getRandomFromList([1, 1, 1, 2, 2, 3]));
       snake.points.increment();
       snake.addTailBlock();
+      this.#handleSnakeEatsBotFlesh(snake.headId);
     }
   }
 
@@ -213,6 +209,7 @@ export class Game {
   #turnFleshIntoFood(snake) {
     for (const piece of snake) {
       this.#food.drop(piece.index);
+      piece.setIsHead(false);
       piece.updateAsFood();
     }
   }
