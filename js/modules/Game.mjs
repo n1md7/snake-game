@@ -1,5 +1,8 @@
 import {Food} from "./Food.mjs";
 import {MathUtils} from "./utils/MathUtils.mjs";
+import {Bot} from "./Bot.mjs";
+import {Speed} from "./Speed.mjs";
+import {Point} from "./Point.mjs";
 
 export class Game {
   /** @type {Number} */
@@ -78,9 +81,8 @@ export class Game {
 
   /** @param {Snake | Bot} snake */
   setLost(snake) {
-    // When Bot loses just remove the freaking snake
     if (snake.isBot) {
-      console.log(`${snake.name} has fallen on the battlefield - 😞`, this.#bots);
+      console.log(`${snake.name} has fallen on the battlefield - 😞`);
       return snake.stop();
     }
     // Or evaluate player
@@ -116,11 +118,7 @@ export class Game {
 
   /** @param {Number} [currentTick = 0] */
   #loop(currentTick = 0) {
-    if (currentTick - this.#lastTick > this.#interval) {
-      this.#lastTick = currentTick;
-      if (this.#update(currentTick)) return void 0;
-    }
-
+    if (this.#update(currentTick)) return void 0;
     window.requestAnimationFrame(this.#loop.bind(this));
   }
 
@@ -215,5 +213,11 @@ export class Game {
       piece.setIsHead(false);
       piece.updateAsFood();
     }
+  }
+
+  /** @param {Snake} snake */
+  #removeDead(snake) {
+    const idx = this.#bots.findIndex((bot) => bot.id === snake.id);
+    if(idx > -1) this.#bots.splice(idx, 1);
   }
 }
