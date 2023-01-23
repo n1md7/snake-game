@@ -112,16 +112,18 @@
   const gameUI = new GameUI(canvas, width, height);
   const grid = new Grid(row, col, block, gameUI);
   const speed = new Speed(125, 25);
-  const snake = new Snake(initialPosition, grid, speed, 'rgba(232,13,13,0.29)');
+  const point = new Point(0);
+  const snake = new Snake(initialPosition, grid, speed, point, 'rgba(232,13,13,0.29)', 'Player');
   const bots = [
-    new Bot(grid, 10 * 96, new Speed(250, 25), 'rgba(4,135,152,0.62)'),
-    new Bot(grid, 20 * 96, new Speed(300, 35), 'rgba(131,117,31,0.5)'),
-    new Bot(grid, 30 * 96, new Speed(350, 45), 'rgba(98,30,92,0.4)'),
-    new Bot(grid, 40 * 96, new Speed(400, 55), 'rgba(203,12,28,0.34)')
+    new Bot(grid, 10 * 96, new Speed(250, 25), new Point(0), 'rgba(4,135,152,0.62)', 'Bob - BOT'),
+    new Bot(grid, 20 * 96, new Speed(300, 35), new Point(0), 'rgba(131,117,31,0.5)', 'Alice - BOT'),
+    new Bot(grid, 30 * 96, new Speed(350, 45), new Point(0), 'rgba(98,30,92,0.4)', 'Jason - BOT'),
+    new Bot(grid, 40 * 96, new Speed(400, 55), new Point(0), 'rgba(203,12,28,0.34)', 'Lilly - BOT'),
+    new Bot(grid, 45 * 96, new Speed(400, 55), new Point(0), 'rgba(82,3,10,0.34)', 'John - BOT'),
   ];
   const food = new Food(grid, snake);
-  const point = new Point(0);
-  const game = new Game(grid, snake, gameUI, food, point, bots);
+  const game = new Game(grid, snake, gameUI, food, bots);
+  game.setPointsToWin(15);
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   point.onBroadcast((point) => pointValue.innerHTML = point);
   snake.onBroadcast((length) => lengthValue.innerHTML = length);

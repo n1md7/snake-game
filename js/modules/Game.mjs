@@ -16,32 +16,32 @@ export class Game {
   /** @type {Grid} */
   #grid;
   /** @type {Snake} */
-  #snake;
+  #player;
+  /** @type {Snake} */
+  #actionTarget;
   /** @type {Snake[]} */
   #bots;
   /** @type {GameUI} */
   #canvas;
   /** @type {Food} */
   #food;
-  /** @type {Point} */
-  #point;
+  /** @type {Number} */
+  #pointToWin = 1;
 
   /**
    * @param {Grid} grid
-   * @param {Snake} snake
+   * @param {Snake} player
    * @param {GameUI} canvas
    * @param {Food} food
-   * @param {Point} point
    * @param {Snake[]} bots
    */
-  constructor(grid, snake, canvas, food, point, bots) {
+  constructor(grid, player, canvas, food, bots) {
     this.#grid = grid;
-    this.#snake = snake;
+    this.#player = player;
     this.#canvas = canvas;
     this.#interval = 1000 / this.#fps;
     this.#lastTick = 0;
     this.#food = food;
-    this.#point = point;
     this.#bots = bots;
   }
 
@@ -61,13 +61,35 @@ export class Game {
     return this.#grid.level;
   }
 
-  setWon() {
+  /**
+   * @param {Number} points
+   */
+  setPointsToWin(points) {
+    this.#pointToWin = points
+  }
+
+  /** @param {Snake} snake */
+  setWon(snake) {
     this.#won = true;
+    this.#actionTarget = snake;
     this.setEnded();
   }
 
-  setLost() {
+  /** @param {Snake | Bot} snake */
+  setLost(snake) {
+    // When Bot loses just remove the freaking snake
+    if (snake.isBot) {
+      // FIXME, snake parts still on the grid
+      snake.stop();
+      this.#removeBodyOf(snake);
+      const index = this.#bots.findIndex((bot) => bot.id === snake.id);
+      console.log(`${snake.name} has fallen on the battlefield - 😞`, index, this.#bots);
+      if (index !== -1) this.#bots.splice(index, 1);
+      return;
+    }
+    // Or evaluate player
     this.#lost = true;
+    this.#actionTarget = snake;
     this.setEnded();
   }
 
@@ -79,14 +101,13 @@ export class Game {
     this.#won = false;
     this.#ended = false;
     this.#lost = false;
+    this.#actionTarget = null;
     this.#grid.reset();
-    this.#snake.reset();
+    this.#player.reset();
     this.#canvas.reset();
   }
 
-  /**
-   * @param {Number} level
-   */
+  /** @param {Number} level */
   setLevel(level) {
     this.#grid.setLevel(level);
   }
@@ -96,9 +117,7 @@ export class Game {
     this.#loop();
   }
 
-  /**
-   * @param {Number} [currentTick = 0]
-   */
+  /** @param {Number} [currentTick = 0] */
   #loop(currentTick = 0) {
     const delta = currentTick - this.#lastTick;
     if (delta > this.#interval) {
@@ -118,9 +137,10 @@ export class Game {
 
   /** @param {Number} currentTick */
   #update(currentTick) {
-    for (const snake of [this.#snake, ...this.#bots]) {
+    for (const snake of [this.#player, ...this.#bots]) {
+      if (this.#pointToWin === snake.points.point) this.setWon(snake);
       if (snake.needsUpdate(currentTick)) {
-        if (!this.#snake.canMove()) this.setLost();
+        if (!snake.canMove()) this.setLost(snake);
         if (this.#ended) {
           if (this.#won) this.#handleGameWon();
           if (this.#lost) this.#handleGameLost();
@@ -148,8 +168,7 @@ export class Game {
       // 🐍 eats 🍔
       this.#food.ids.delete(snake.headId);
       this.#food.generate(2);
-      // FIXME point is shared, should be bound with snakes
-      this.#point.increment();
+      snake.points.increment();
       snake.addTailBlock();
     }
   }
@@ -164,14 +183,22 @@ export class Game {
   }
 
   #handleGameLost() {
-    console.log('You LOST', 'cause:', this.#snake.status);
+    console.log(`Snake "${this.#actionTarget.name}" has LOST`, 'cause:', this.#actionTarget.status);
     this.#canvas.showLooser();
-    const nextBlock = this.#snake.nextBlock();
+    const nextBlock = this.#actionTarget.nextBlock();
     if (nextBlock) nextBlock.updateAsBump();
   }
 
   #handleGameWon() {
-    console.log('You WON');
+    alert(`Winner is ${this.#actionTarget.name}`)
     this.#canvas.showWinner();
+  }
+
+  /** @param {Snake} snake */
+  #removeBodyOf(snake){
+    for(const piece of snake) {
+      // FIXME, something is odd, not being updated as food
+      piece.updateAsFood();
+    }
   }
 }

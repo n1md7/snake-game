@@ -18,6 +18,10 @@ export class Point {
     return this.#point;
   }
 
+  valueOf(){
+    return this.#point;
+  }
+
   increment() {
     this.#point++;
     if (typeof this.#callback === 'function') this.#callback(this.#point);

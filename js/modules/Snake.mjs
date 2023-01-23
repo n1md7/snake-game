@@ -1,5 +1,6 @@
 import {Grid} from "./Grid.mjs";
 import {Direction} from "./Direction.mjs";
+import {MathUtils} from "./utils/MathUtils.mjs";
 
 export class Snake {
   static Status = {
@@ -39,29 +40,56 @@ export class Snake {
   #lastUpdate;
   /** @type {String} - Head color */
   #color;
+  /** @type {Point} - Snake points */
+  #point;
+  /** @type {String} - Snake name */
+  #name;
+  /** @type {String} - Snake unique identifier */
+  #id;
 
   /**
    * @param {Number[]} blocks
    * @param {Grid} grid
    * @param {Speed} speed
+   * @param {Point} point
    * @param {String} color
+   * @param {String} name
    */
-  constructor(blocks, grid, speed, color) {
+  constructor(blocks, grid, speed, point, color, name) {
+    this.#id = this.#randomId();
     this.#grid = grid;
     this.#speed = speed;
+    this.#point = point;
     this.#initialBlocks = Array.from(blocks);
     this.#lastUpdate = 0;
     this.#color = color;
+    this.#name = name;
 
     this.reset();
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get isBot() {
+    return false;
   }
 
   get color() {
     return this.#color;
   }
 
+  get name() {
+    return this.#name;
+  }
+
   get speed() {
     return this.#speed;
+  }
+
+  get points() {
+    return this.#point;
   }
 
   get headId() {
@@ -105,6 +133,11 @@ export class Snake {
   addTailBlock(weight = 1) {
     this.#snacksToDigest += weight;
     if (typeof this.#callback === 'function') this.#callback(this.#blocks.size + weight);
+  }
+
+  /** @return {string} */
+  #randomId() {
+    return MathUtils.getRandomInt(0, 9e12) + ':' + Date.now();
   }
 
   /** @returns {{row: Number, col: Number}} */
@@ -180,7 +213,9 @@ export class Snake {
     this.#direction.removeLast();
   }
 
-  /** @returns {boolean} */
+  /**
+   * @description It determines whether next move is possible or the snake bumps into an object
+   * @returns {boolean} */
   canMove() {
     const next = this.#nextIndex();
     const nextBlock = this.#grid.getBlockByXY(next.row, next.col);

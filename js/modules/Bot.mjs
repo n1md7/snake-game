@@ -8,17 +8,22 @@ export class Bot extends Snake {
 
   /**
    * @param {Grid} grid
-   * @param {Number} point
+   * @param {Number} spawnIndex
    * @param {Speed} speed
+   * @param {Point} point
    * @param {String} color
+   * @param {String} name
    */
-  constructor(grid, point, speed, color) {
-    const body = [...MathUtils.getListNumbers(point, point + 5)];
-    super(body, grid, speed, color);
+  constructor(grid, spawnIndex, speed, point, color, name) {
+    const body = [...MathUtils.getListNumbers(spawnIndex, spawnIndex + 5)];
+    super(body, grid, speed, point, color, name);
+  }
+
+  get isBot() {
+    return true;
   }
 
   run() {
-    if (this.blocks.size <= 1) this.stop();
     const random = MathUtils.getRandomInt(0, 3);
     if (random === 0) this.goUp();
     if (random === 1) this.goDown();
