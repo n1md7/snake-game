@@ -35,4 +35,12 @@ export class Food {
       this.#ids.add(point);
     }
   }
+
+  /**
+   * @description Drop food on the specific point
+   * @param {Number} point - Linear index of the Grid
+   */
+  drop(point) {
+    this.#ids.add(point);
+  }
 }

@@ -1,4 +1,5 @@
 import {Food} from "./Food.mjs";
+import {MathUtils} from "./utils/MathUtils.mjs";
 
 export class Game {
   /** @type {Number} */
@@ -79,13 +80,8 @@ export class Game {
   setLost(snake) {
     // When Bot loses just remove the freaking snake
     if (snake.isBot) {
-      // FIXME, snake parts still on the grid
-      snake.stop();
-      this.#removeBodyOf(snake);
-      const index = this.#bots.findIndex((bot) => bot.id === snake.id);
-      console.log(`${snake.name} has fallen on the battlefield - 😞`, index, this.#bots);
-      if (index !== -1) this.#bots.splice(index, 1);
-      return;
+      console.log(`${snake.name} has fallen on the battlefield - 😞`, this.#bots);
+      return snake.stop();
     }
     // Or evaluate player
     this.#lost = true;
@@ -120,8 +116,7 @@ export class Game {
 
   /** @param {Number} [currentTick = 0] */
   #loop(currentTick = 0) {
-    const delta = currentTick - this.#lastTick;
-    if (delta > this.#interval) {
+    if (currentTick - this.#lastTick > this.#interval) {
       this.#lastTick = currentTick;
       if (this.#update(currentTick)) return void 0;
     }
@@ -139,6 +134,11 @@ export class Game {
   /** @param {Number} currentTick */
   #update(currentTick) {
     for (const snake of [this.#player, ...this.#bots]) {
+      if (snake.isDisabled) {
+        this.#turnFleshIntoFood(snake);
+        // Skip over dead bodies
+        continue;
+      }
       if (this.#pointToWin === snake.points.point) this.setWon(snake);
       if (snake.needsUpdate(currentTick)) {
         if (!snake.canMove()) this.setLost(snake);
@@ -166,11 +166,25 @@ export class Game {
   /** @param {Snake} snake */
   #handleSnakeEatFood(snake) {
     if (this.#food.ids.has(snake.headId)) {
-      // 🐍 eats 🍔
+      this.#handleSnakeEatsBotFlesh(snake.headId);
       this.#food.ids.delete(snake.headId);
-      this.#food.generate(2);
+      this.#food.generate(MathUtils.getRandomFromList([1, 1, 1, 2, 2, 3]));
       snake.points.increment();
       snake.addTailBlock();
+    }
+  }
+
+  /** @param {Number} targetId */
+  #handleSnakeEatsBotFlesh(targetId) {
+    // NOTE: no player data is involved here.
+    for (const bot of this.#bots) {
+      if (bot.isDisabled) {
+        for (const piece of bot) {
+          if (targetId === piece.index) {
+            bot.removeBlockByIdx(piece.index);
+          }
+        }
+      }
     }
   }
 
@@ -196,9 +210,9 @@ export class Game {
   }
 
   /** @param {Snake} snake */
-  #removeBodyOf(snake) {
+  #turnFleshIntoFood(snake) {
     for (const piece of snake) {
-      // FIXME, something is odd, not being updated as food
+      this.#food.drop(piece.index);
       piece.updateAsFood();
     }
   }

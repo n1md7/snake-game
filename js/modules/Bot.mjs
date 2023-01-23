@@ -15,7 +15,8 @@ export class Bot extends Snake {
    * @param {String} name
    */
   constructor(grid, spawnIndex, speed, point, color, name) {
-    const body = [...MathUtils.getListNumbers(spawnIndex, spawnIndex + 5)];
+    const rand = MathUtils.getRandomInt(0, 128);
+    const body = [...MathUtils.getListNumbers(spawnIndex, spawnIndex + 7)].map(v => v + rand);
     super(body, grid, speed, point, color, name);
   }
 
@@ -30,10 +31,11 @@ export class Bot extends Snake {
     if (random === 2) this.goLeft();
     if (random === 3) this.goRight();
     random ? this.decreaseSpeed() : this.increaseSpeed();
-    this.#id = setTimeout(this.run.bind(this), MathUtils.getRandomInt(1500, 8000));
+    this.#id = setTimeout(this.run.bind(this), MathUtils.getRandomInt(500, 3000));
   }
 
   stop() {
+    super.stop();
     clearTimeout(this.#id);
   }
 }

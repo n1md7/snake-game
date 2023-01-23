@@ -18,7 +18,7 @@ export class Point {
     return this.#point;
   }
 
-  valueOf(){
+  valueOf() {
     return this.#point;
   }
 

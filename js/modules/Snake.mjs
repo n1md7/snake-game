@@ -46,6 +46,8 @@ export class Snake {
   #name;
   /** @type {String} - Snake unique identifier */
   #id;
+  /** @type {Boolean} - Whether Snake can move */
+  #enabled = true;
 
   /**
    * @param {Number[]} blocks
@@ -70,6 +72,14 @@ export class Snake {
 
   get id() {
     return this.#id;
+  }
+
+  get isEnabled() {
+    return this.#enabled;
+  }
+
+  get isDisabled() {
+    return !this.#enabled;
   }
 
   get isBot() {
@@ -106,6 +116,14 @@ export class Snake {
 
   get accelerateRequested() {
     return this.#accelerate;
+  }
+
+  stop() {
+    this.#enabled = false;
+  }
+
+  #start() {
+    this.#enabled = true;
   }
 
   /** @param {Number} currentTick */
@@ -184,6 +202,10 @@ export class Snake {
     this.#setDirection(Direction.Type.Down);
   }
 
+  /**
+   * @description Iterates over Snake Blocks
+   * @return {Generator<Block|null, void, *>}
+   */
   * [Symbol.iterator]() {
     for (const idx of this.#blocks) {
       yield this.#grid.getBlockByLinearId(idx);
@@ -211,6 +233,10 @@ export class Snake {
     this.#blockHeadRef.setIsHead(true);
     this.#blockHeadRef.setBackgroundColor(this.#color);
     this.#direction.removeLast();
+  }
+
+  removeBlockByIdx(idx) {
+    return this.#blocks.delete(idx);
   }
 
   /**
@@ -252,6 +278,7 @@ export class Snake {
     this.#direction = new Direction();
     this.#accelerate = false;
     this.#speed.reset();
+    this.#start();
     if (typeof this.#callback === 'function') this.#callback(this.#blocks.size);
   }
 }

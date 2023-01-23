@@ -11,6 +11,15 @@ export class MathUtils {
   }
 
   /**
+   * @description Gets random value from the list
+   * @param {Number[]} list
+   * @returns {number}
+   */
+  static getRandomFromList(list) {
+    return list[MathUtils.getRandomInt(0, list.length - 1)];
+  }
+
+  /**
    * @description Gets random integer between the range (inclusive) excluding specified Set
    * @param {Number} from
    * @param {Number} to

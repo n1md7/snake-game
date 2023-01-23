@@ -44,6 +44,13 @@ export class Block {
     this.#create();
   }
 
+  /**
+   * @returns {Number} Linear index on the Grid
+   */
+  get index() {
+    return this.#index;
+  }
+
   #create() {
     this.#block = document.createElement('div');
     this.#block.style.setProperty('width', this.#blockWH + 'px');
@@ -120,8 +127,8 @@ export class Block {
     // this.#block.innerText = this.#index;
     if (this.#isHead) this.#block.classList.add(Block.type.Head);
 
-    if(this.#colorHasApplied) this.#block.style.removeProperty('background-color');
-    if(this.#color && !this.#colorHasApplied) {
+    if (this.#colorHasApplied) this.#block.style.removeProperty('background-color');
+    if (this.#color && !this.#colorHasApplied) {
       this.#block.style.setProperty('background-color', this.#color);
       this.#color = null;
       this.#colorHasApplied = true;
