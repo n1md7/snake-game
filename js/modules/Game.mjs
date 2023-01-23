@@ -124,7 +124,7 @@ export class Game {
    * @description Initial update, runs only once per start/reset.
    */
   #updateOnce() {
-    for (const _ of MathUtils.numbers(0, 10)) this.#food.generate();
+    this.#food.generate();
   }
 
   /** @param {Number} currentTick */
@@ -162,7 +162,7 @@ export class Game {
   #handleSnakeEatFood(snake) {
     if (this.#food.ids.has(snake.headId)) {
       this.#food.ids.delete(snake.headId);
-      this.#food.generate(MathUtils.getRandomFromList([1, 1, 1, 2, 2, 3]));
+      this.#food.generate(1);
       snake.points.increment();
       snake.addTailBlock();
       this.#handleSnakeEatsBotFlesh(snake.headId);
