@@ -26,7 +26,7 @@ export class Food {
    * @param {Number} [count = 1]
    */
   generate(count = 1) {
-    for (const _ of MathUtils.getListNumbers(1, count)) {
+    for (const _ of MathUtils.numbers(1, count)) {
       const size = this.#grid.col * this.#grid.row;
       const reserved = new Set([...this.#grid.getLevelBlocks(), ...this.#snake.blocks]);
       const point = MathUtils.getRandomWithoutExcluded(0, size, reserved);

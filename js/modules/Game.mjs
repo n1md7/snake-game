@@ -1,8 +1,6 @@
 import {Food} from "./Food.mjs";
 import {MathUtils} from "./utils/MathUtils.mjs";
 import {Bot} from "./Bot.mjs";
-import {Speed} from "./Speed.mjs";
-import {Point} from "./Point.mjs";
 
 export class Game {
   /** @type {Number} */
@@ -126,7 +124,7 @@ export class Game {
    * @description Initial update, runs only once per start/reset.
    */
   #updateOnce() {
-    this.#food.generate();
+    for (const _ of MathUtils.numbers(0, 10)) this.#food.generate();
   }
 
   /** @param {Number} currentTick */
@@ -218,6 +216,6 @@ export class Game {
   /** @param {Snake} snake */
   #removeDead(snake) {
     const idx = this.#bots.findIndex((bot) => bot.id === snake.id);
-    if(idx > -1) this.#bots.splice(idx, 1);
+    if (idx > -1) this.#bots.splice(idx, 1);
   }
 }

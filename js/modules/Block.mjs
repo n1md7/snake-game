@@ -115,6 +115,10 @@ export class Block {
     return this.#type === Block.type.Wall;
   }
 
+  isFood() {
+    return this.#type === Block.type.Food;
+  }
+
   update() {
     this.#block.classList.remove(
       Block.type.Empty,

@@ -38,8 +38,21 @@ export class MathUtils {
    * @param {Number} to
    * @returns {Symbol.iterator}
    */
-  static* getListNumbers(from, to) {
+  static* numbers(from, to) {
     for (let i = from; i <= to; i++) yield i;
+  }
+
+  /**
+   * @description Generates numbers between the range (inclusive)
+   * @param {Number} from
+   * @param {Number} to
+   * @returns {Number[]}
+   */
+  static numberList(from, to) {
+    /** @type {Number[]} */
+    const nums = [];
+    for (let i = from; i <= to; i++) nums.push(i);
+    return nums;
   }
 
   /**

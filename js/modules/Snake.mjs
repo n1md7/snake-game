@@ -118,6 +118,11 @@ export class Snake {
     return this.#status;
   }
 
+  /** @returns {Direction.Type} */
+  get direction() {
+    return this.#direction.peek();
+  }
+
   get accelerateRequested() {
     return this.#accelerate;
   }
@@ -163,7 +168,7 @@ export class Snake {
   }
 
   /** @returns {{row: Number, col: Number}} */
-  #nextIndex() {
+  nextIndex() {
     const direction = this.#direction.peek();
     let {row, col} = this.#grid.get2dIdx(this.#blockHeadIdx);
 
@@ -228,7 +233,7 @@ export class Snake {
 
   appendHead() {
     if (!this.canMove()) return;
-    const next = this.#nextIndex();
+    const next = this.nextIndex();
     const linearIdx = this.#grid.getLinearIdx(next.row, next.col);
     this.#blocks.add(linearIdx);
     this.#blockHeadIdx = linearIdx;
@@ -247,7 +252,7 @@ export class Snake {
    * @description It determines whether next move is possible or the snake bumps into an object
    * @returns {boolean} */
   canMove() {
-    const next = this.#nextIndex();
+    const next = this.nextIndex();
     const nextBlock = this.#grid.getBlockByXY(next.row, next.col);
     if (!nextBlock) {
       this.#status = Snake.Status.DeadByMapOverflow;
@@ -269,7 +274,7 @@ export class Snake {
    * @returns {Block|null}
    */
   nextBlock() {
-    const next = this.#nextIndex();
+    const next = this.nextIndex();
     return this.#grid.getBlockByXY(next.row, next.col);
   }
 
