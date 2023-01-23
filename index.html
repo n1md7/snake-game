@@ -40,7 +40,7 @@
 
     .canvas > .block.food {
       background-color: #523e02;
-      animation: blink 100ms infinite;
+      animation: blink 1s infinite;
     }
 
     .canvas > .block.empty {
@@ -123,7 +123,7 @@
   ];
   const food = new Food(grid, snake);
   const game = new Game(grid, snake, gameUI, food, bots);
-  game.setPointsToWin(25);
+  game.setPointsToWin(128);
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   point.onBroadcast((point) => pointValue.innerHTML = point);
   snake.onBroadcast((length) => lengthValue.innerHTML = length);
