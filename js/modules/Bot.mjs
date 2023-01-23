@@ -29,7 +29,7 @@ export class Bot extends Snake {
   }
 
   run() {
-    const target = this.find(MathUtils.getRandomInt(3, 20));
+    const target = this.find(MathUtils.getRandomInt(3, 15));
     if (target !== null) {
       const currentTarget = this.nextIndex();
       while (target.row !== currentTarget.row && target.col !== currentTarget.col) {
@@ -39,9 +39,7 @@ export class Bot extends Snake {
         } else if (currentTarget.row < target.row) {
           currentTarget.row++;
           this.goDown();
-        }
-
-        if (currentTarget.col > target.col) {
+        } if (currentTarget.col > target.col) {
           currentTarget.col--;
           this.goLeft();
         } else if (currentTarget.col < target.col) {
