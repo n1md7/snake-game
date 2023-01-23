@@ -134,7 +134,10 @@ export class Game {
   /** @param {Number} currentTick */
   #update(currentTick) {
     for (const snake of [this.#player, ...this.#bots]) {
-      if (snake.isDisabled) return this.#turnFleshIntoFood(snake);
+      if (snake.isDisabled) {
+        this.#turnFleshIntoFood(snake);
+        continue;
+      }
       if (this.#pointToWin === snake.points.point) this.setWon(snake);
       if (snake.needsUpdate(currentTick)) {
         if (!snake.canMove()) this.setLost(snake);
