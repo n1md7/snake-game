@@ -1,10 +1,14 @@
 export class Point {
   /** @type {Number} */
   #point;
+
   /**
-   * @param {Number} delay
+   * @callback Callback
+   * @param {Number} point - Current point
    * @returns {void}
    */
+
+  /** @type {Callback} */
   #callback;
 
   /**
@@ -32,9 +36,7 @@ export class Point {
     if (typeof this.#callback === 'function') this.#callback(this.#point);
   }
 
-  /**
-   * @param {Function} fn
-   */
+  /** @param {Callback} fn */
   onBroadcast(fn) {
     this.#callback = fn;
   }

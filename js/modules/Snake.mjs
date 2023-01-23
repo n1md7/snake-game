@@ -31,10 +31,14 @@ export class Snake {
   #accelerate = false;
   /** @type {Number} */
   #snacksToDigest = 0;
+
   /**
-   * @param {Number} delay
+   * @callback Callback
+   * @param {Number} length - Current length
    * @returns {void}
    */
+
+  /** @type {Callback} */
   #callback;
   /** @type {Number} - determines when to tick next */
   #lastUpdate;
@@ -256,9 +260,7 @@ export class Snake {
     return !(nextBlock.isBody() || nextBlock.isWall());
   }
 
-  /**
-   * @param {Function} fn
-   */
+  /** @param {Callback} fn */
   onBroadcast(fn) {
     this.#callback = fn;
   }

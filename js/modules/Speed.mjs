@@ -5,10 +5,14 @@ export class Speed {
   #MIN_SPEED = 300;
   /** @type {Number} */
   #current;
+
   /**
-   * @param {Number} delay
+   * @callback Callback
+   * @param {Number} delay - Current delay, actual speed would be 1000/delay in BPS
    * @returns {void}
    */
+
+  /** @type {Callback} */
   #callback;
 
   /**
@@ -30,9 +34,7 @@ export class Speed {
     return this.#current;
   }
 
-  /**
-   * @param {Function} fn
-   */
+  /** @param {Callback} fn */
   onBroadcast(fn) {
     this.#callback = fn;
   }

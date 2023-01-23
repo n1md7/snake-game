@@ -126,8 +126,8 @@
   const game = new Game(grid, snake, gameUI, food, bots);
   game.setPointsToWin(row * col - 10);
   speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
-  point.onBroadcast((point) => pointValue.innerHTML = point);
-  snake.onBroadcast((length) => lengthValue.innerHTML = length);
+  point.onBroadcast((point) => pointValue.innerHTML = point.toString());
+  snake.onBroadcast((length) => lengthValue.innerHTML = length.toString());
 
   window.onload = () => {
     game.run();
