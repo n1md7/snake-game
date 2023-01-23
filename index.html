@@ -101,7 +101,7 @@
   const row = height / block;
   const col = width / block;
 
-  const initialPosition = [...MathUtils.numbers(1, 6)].map(a => a + col);
+  const initialPosition = MathUtils.numberList(1 + col, 6 + col);
   const canvas = document.querySelector('div.canvas');
   const speedValue = document.querySelector('div.status>div.speed>strong');
   const pointValue = document.querySelector('div.status>div.point>strong');
