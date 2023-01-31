@@ -15,14 +15,22 @@
       margin: 8px auto;
       display: flex;
       justify-content: space-evenly;
+      background: white;
+    }
+
+    .player.status{
+      position: sticky;
+      top: 0;
     }
 
     .canvas {
-      border: var(--block-size) solid rgba(90, 134, 20, 0.3);
+      border: 1px solid rgba(90, 134, 20, 0.3);
       box-sizing: content-box;
       margin: 24px auto;
       display: flex;
       flex-wrap: wrap;
+      position: sticky;
+      top: 24px;
     }
 
     .canvas > .block {
@@ -74,13 +82,16 @@
       <select name="level"></select>
     </label>
   </h3>
-  <div class="status">
-    <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
+  <div class="text-muted text-center">Use arrow keys or (<code>WASD</code>) to navigate and <code>Space</code> to accelerate. <code>R</code> to restart.</div>
+  <div class="player status">
+    <div class="name"><strong>Player(You)</strong></div>
+    <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="~Blocks Per Second">BPS</span></div>
     <div class="point">Points: <strong>0</strong> <span class="text-muted" title="Points">PTS</span></div>
-    <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span>
-    </div>
+    <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span></div>
+    <div class="alive"><strong>Active</strong></div>
   </div>
   <div class="canvas"></div>
+  <div class="bots"></div>
 </div>
 
 <script type="module">
@@ -95,6 +106,18 @@
   import {Levels} from "./js/modules/Levels.mjs";
   import {MathUtils} from "./js/modules/utils/MathUtils.mjs";
 
+  const botTemplate = `
+    <div class="bot">
+      <div class="status">
+        <div class="name"><strong>Alice</strong></div>
+        <div class="speed">Speed: <strong>0.0</strong> <span class="text-muted" title="Blocks Per Second">BPS</span></div>
+        <div class="point">Points: <strong>0</strong> <span class="text-muted" title="Points">PTS</span></div>
+        <div class="length">Length: <strong>0</strong> <span class="text-muted" title="Snake Length in Blocks">B</span></div>
+        <div class="alive"><strong>Active</strong></div>
+      </div>
+    </div>
+  `;
+
   const width = 960;
   const height = 480;
   const block = 10;
@@ -103,9 +126,11 @@
 
   const initialPosition = MathUtils.numberList(1 + col, 6 + col);
   const canvas = document.querySelector('div.canvas');
-  const speedValue = document.querySelector('div.status>div.speed>strong');
-  const pointValue = document.querySelector('div.status>div.point>strong');
-  const lengthValue = document.querySelector('div.status>div.length>strong');
+  const botPoints = document.querySelector('div.bots');
+  const speedValue = document.querySelector('div.player.status>div.speed>strong');
+  const pointValue = document.querySelector('div.player.status>div.point>strong');
+  const lengthValue = document.querySelector('div.player.status>div.length>strong');
+  const aliveStatus = document.querySelector('div.player.status>div.alive>strong');
   const levels = document.querySelector('div .levels select');
 
   lengthValue.innerHTML = initialPosition.length.toString();
@@ -116,26 +141,60 @@
   const point = new Point(0);
   const snake = new Snake(initialPosition, grid, speed, point, 'rgba(232,13,13,0.29)', 'Player');
   const bots = [
-    new Bot(grid, 10 * 96, new Speed(250, 25), new Point(0), 'rgba(4,135,152,0.62)', 'Bob - BOT'),
-    new Bot(grid, 15 * 96, new Speed(300, 5), new Point(0), 'rgba(131,117,31,0.5)', 'Alice - BOT'),
-    new Bot(grid, 20 * 96, new Speed(350, 1), new Point(0), 'rgba(98,30,92,0.4)', 'Jason - BOT'),
-    new Bot(grid, 25 * 96, new Speed(400, 2), new Point(0), 'rgba(203,12,28,0.34)', 'Lilly - BOT'),
-    new Bot(grid, 30 * 96, new Speed(400, 10), new Point(0), 'rgba(82,3,10,0.34)', 'John - BOT'),
-    new Bot(grid, 35 * 96, new Speed(400, 15), new Point(0), 'rgba(82,3,10,0.34)', 'John - BOT'),
-    new Bot(grid, 40 * 96, new Speed(400, 55), new Point(0), 'rgba(82,3,10,0.34)', 'John - BOT'),
+    new Bot(grid, 10 * 96, new Speed(250, 25), new Point(0), 'rgba(4,135,152,0.62)', 'Bob'),
+    new Bot(grid, 15 * 96, new Speed(300, 20), new Point(0), 'rgba(131,117,31,0.5)', 'Alice'),
+    new Bot(grid, 20 * 96, new Speed(350, 30), new Point(0), 'rgba(98,30,92,0.4)', 'Jason'),
+    new Bot(grid, 25 * 96, new Speed(400, 10), new Point(0), 'rgba(203,12,28,0.34)', 'Lilly'),
+    new Bot(grid, 30 * 96, new Speed(400, 10), new Point(0), 'rgba(82,3,10,0.34)', 'John'),
+    new Bot(grid, 35 * 96, new Speed(400, 15), new Point(0), 'rgba(82,3,10,0.34)', 'Anna'),
+    new Bot(grid, 40 * 96, new Speed(400, 55), new Point(0), 'rgba(82,3,10,0.34)', 'Nick'),
+    new Bot(grid, 40 * 96, new Speed(400, 65), new Point(0), 'rgba(82,3,10,0.34)', 'Chrome'),
+    new Bot(grid, 40 * 96, new Speed(400, 75), new Point(0), 'rgba(82,3,10,0.34)', 'YouTube'),
   ];
   const food = new Food(grid, snake);
   const game = new Game(grid, snake, gameUI, food, bots);
   game.setPointsToWin(row * col - 10);
-  speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
-  point.onBroadcast((point) => pointValue.innerHTML = point.toString());
-  snake.onBroadcast((length) => lengthValue.innerHTML = length.toString());
+  snake.speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
+  snake.points.onBroadcast((point) => pointValue.innerHTML = point.toString());
+  snake.onBroadcast(({size, stopped}) => {
+    if (size) lengthValue.innerHTML = size.toString();
+    if (stopped) aliveStatus.innerHTML = '<span class="text-danger">Dead</span>';
+  });
+
+
+  const createElement = html => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
+  }
 
   window.onload = () => {
     game.run();
-    bots.map(bot => bot.run());
+
+    for (const bot of bots) {
+      const dom = createElement(botTemplate);
+      const name = dom.querySelector('.name>strong');
+      const alive = dom.querySelector('.alive>strong');
+      const speed = dom.querySelector('.speed>strong');
+      const points = dom.querySelector('.point>strong');
+      const blocks = dom.querySelector('.length>strong');
+
+      bot.run();
+      name.innerText = bot.name;
+      bot.speed.onBroadcast((delay) => speed.innerHTML = Number(1000 / delay).toPrecision(2));
+      bot.points.onBroadcast((point) => points.innerHTML = point.toString());
+      bot.onBroadcast(({size, stopped}) => {
+        if (size) blocks.innerHTML = size.toString();
+        if (stopped) alive.innerHTML = '<span class="text-danger">Dead</span>';
+      });
+
+      botPoints.appendChild(dom);
+    }
   };
   window.onkeydown = (e) => {
+    // Disable Space scrolling
+    if (e.target === document.body) e.preventDefault();
+
     if (['ArrowLeft', 'KeyA'].includes(e.code)) snake.goLeft();
     if (['ArrowRight', 'KeyD'].includes(e.code)) snake.goRight();
     if (['ArrowDown', 'KeyS'].includes(e.code)) snake.goDown();
@@ -162,7 +221,6 @@
     game.setLevel(+target.value);
     Promise.resolve().then(() => levels.blur());
   };
-
 
 </script>
 </body>

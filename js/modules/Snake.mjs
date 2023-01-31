@@ -34,7 +34,7 @@ export class Snake {
 
   /**
    * @callback Callback
-   * @param {Number} length - Current length
+   * @param {{size?: Number, stopped?: Boolean}} [length] - Broadcast data
    * @returns {void}
    */
 
@@ -129,6 +129,7 @@ export class Snake {
 
   stop() {
     this.#enabled = false;
+    if (typeof this.#callback === 'function') this.#callback({stopped: true});
   }
 
   #start() {
@@ -159,7 +160,7 @@ export class Snake {
    */
   addTailBlock(weight = 1) {
     this.#snacksToDigest += weight;
-    if (typeof this.#callback === 'function') this.#callback(this.#blocks.size + weight);
+    if (typeof this.#callback === 'function') this.#callback({size: this.#blocks.size + weight});
   }
 
   /** @return {string} */
@@ -286,6 +287,6 @@ export class Snake {
     this.#accelerate = false;
     this.#speed.reset();
     this.#start();
-    if (typeof this.#callback === 'function') this.#callback(this.#blocks.size);
+    if (typeof this.#callback === 'function') this.#callback({size: this.#blocks.size});
   }
 }

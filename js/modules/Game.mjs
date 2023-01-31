@@ -1,5 +1,4 @@
 import {Food} from "./Food.mjs";
-import {MathUtils} from "./utils/MathUtils.mjs";
 import {Bot} from "./Bot.mjs";
 
 export class Game {
@@ -193,6 +192,7 @@ export class Game {
   }
 
   #handleGameLost() {
+    this.#player.stop();
     console.log(`Snake "${this.#actionTarget.name}" has LOST`, 'cause:', this.#actionTarget.status);
     this.#canvas.showLooser();
     const nextBlock = this.#actionTarget.nextBlock();
