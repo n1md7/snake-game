@@ -179,6 +179,8 @@
       const points = dom.querySelector('.point>strong');
       const blocks = dom.querySelector('.length>strong');
 
+      alive.innerHTML = 'Alive';
+
       bot.run();
       name.innerText = bot.name;
       bot.speed.onBroadcast((delay) => speed.innerHTML = Number(1000 / delay).toPrecision(2));
@@ -202,6 +204,7 @@
     if (['KeyR'].includes(e.code)) {
       game.reset();
       game.run();
+      document.querySelectorAll('.alive>strong').forEach((element) => element.innerHTML = 'Alive')
     }
     if (['Space'].includes(e.code)) snake.increaseSpeed();
   };
