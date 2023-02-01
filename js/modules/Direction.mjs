@@ -60,8 +60,8 @@ export class Direction {
     if (this.#hasExtra()) this.#pop();
   }
 
-  /** @returns {Direction.Type} */
-  peek() {
-    return this.#last();
+  /** @returns {Direction.Type | null} */
+  peek(level = -1) {
+    return this.#directions?.at(level);
   }
 }

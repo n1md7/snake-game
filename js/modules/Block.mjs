@@ -8,6 +8,7 @@ export class Block {
   });
   static extraType = Object.freeze({
     Bump: 'bump',
+    Test: 'test'
   });
 
   /** @type {Block.type | null} */
@@ -102,8 +103,23 @@ export class Block {
     this.update();
   }
 
+  updateAsWall() {
+    this.setType(Block.type.Wall);
+    this.update();
+  }
+
   updateAsBump() {
     this.#extraType = Block.extraType.Bump;
+    this.update();
+  }
+
+  updateAsTest() {
+    this.#extraType = Block.extraType.Test;
+    this.update();
+  }
+
+  resetTest() {
+    this.#extraType = null;
     this.update();
   }
 
@@ -126,6 +142,7 @@ export class Block {
       Block.type.Wall,
       Block.type.Body,
       Block.type.Head,
+      Block.extraType.Test,
       Block.extraType.Bump,
     );
     // this.#block.innerText = this.#index;
@@ -143,6 +160,7 @@ export class Block {
     else if (this.#type === Block.type.Food) this.#block.classList.add(Block.type.Food);
     else if (this.#type === Block.type.Body) this.#block.classList.add(Block.type.Body);
     if (this.#extraType === Block.extraType.Bump) return this.#block.classList.add(Block.extraType.Bump);
+    if (this.#extraType === Block.extraType.Test) return this.#block.classList.add(Block.extraType.Test);
   }
 
   render() {

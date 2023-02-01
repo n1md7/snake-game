@@ -169,8 +169,8 @@ export class Snake {
   }
 
   /** @returns {{row: Number, col: Number}} */
-  nextIndex() {
-    const direction = this.#direction.peek();
+  nextIndex(level = -1) {
+    const direction = this.#direction.peek(level);
     let {row, col} = this.#grid.get2dIdx(this.#blockHeadIdx);
 
     {
@@ -196,20 +196,40 @@ export class Snake {
     this.#direction.add(direction);
   }
 
-  goLeft() {
+  goLeft(debug = false) {
+    if (debug) console.debug('GoLeft requested');
     this.#setDirection(Direction.Type.Left);
   }
 
-  goRight() {
+  goRight(debug = false) {
+    if (debug) console.debug('GoLeft requested');
     this.#setDirection(Direction.Type.Right);
   }
 
-  goUp() {
+  goUp(debug = false) {
+    if (debug) console.debug('GoLeft requested');
     this.#setDirection(Direction.Type.Up);
   }
 
-  goDown() {
+  goDown(debug = false) {
+    if (debug) console.debug('GoLeft requested');
     this.#setDirection(Direction.Type.Down);
+  }
+
+  headingLeft(){
+    return this.direction === Direction.Type.Left;
+  }
+
+  headingRight(){
+    return this.direction === Direction.Type.Right;
+  }
+
+  headingUp(){
+    return this.direction === Direction.Type.Up;
+  }
+
+  headingDown(){
+    return this.direction === Direction.Type.Down;
   }
 
   /**

@@ -64,6 +64,10 @@
       background-color: red;
     }
 
+    .canvas > .block.test {
+      background-color: green;
+    }
+
     @keyframes blink {
       0% {
         background-color: rgba(59, 20, 20, 0.46);
@@ -137,23 +141,33 @@
 
   const gameUI = new GameUI(canvas, width, height);
   const grid = new Grid(row, col, block, gameUI);
-  const speed = new Speed(125, 25);
+  const speed = new Speed(325, 25);
   const point = new Point(0);
   const snake = new Snake(initialPosition, grid, speed, point, 'rgba(232,13,13,0.29)', 'Player');
   const bots = [
-    new Bot(grid, 10 * 96, new Speed(250, 25), new Point(0), 'rgba(4,135,152,0.62)', 'Bob'),
-    new Bot(grid, 15 * 96, new Speed(300, 20), new Point(0), 'rgba(131,117,31,0.5)', 'Alice'),
-    new Bot(grid, 20 * 96, new Speed(350, 30), new Point(0), 'rgba(98,30,92,0.4)', 'Jason'),
-    new Bot(grid, 25 * 96, new Speed(400, 10), new Point(0), 'rgba(203,12,28,0.34)', 'Lilly'),
-    new Bot(grid, 30 * 96, new Speed(400, 10), new Point(0), 'rgba(82,3,10,0.34)', 'John'),
-    new Bot(grid, 35 * 96, new Speed(400, 15), new Point(0), 'rgba(82,3,10,0.34)', 'Anna'),
-    new Bot(grid, 40 * 96, new Speed(400, 55), new Point(0), 'rgba(82,3,10,0.34)', 'Nick'),
-    new Bot(grid, 40 * 96, new Speed(400, 65), new Point(0), 'rgba(82,3,10,0.34)', 'Chrome'),
-    new Bot(grid, 40 * 96, new Speed(400, 75), new Point(0), 'rgba(82,3,10,0.34)', 'YouTube'),
+    // new Bot(grid, 10 * 96, new Speed(300, 25), new Point(0), 'rgba(4,135,152,0.62)', 'Bob'),
+    new Bot(grid, 15 * 96, new Speed(300, 10), new Point(0), 'rgba(131,117,31,0.5)', 'Alice'),
+    // new Bot(grid, 20 * 96, new Speed(550, 60), new Point(0), 'rgba(98,30,92,0.4)', 'Jason'),
+    // new Bot(grid, 25 * 96, new Speed(400, 10), new Point(0), 'rgba(203,12,28,0.34)', 'Lilly'),
+    // new Bot(grid, 30 * 96, new Speed(400, 10), new Point(0), 'rgba(82,3,10,0.34)', 'John'),
+    // new Bot(grid, 35 * 96, new Speed(400, 15), new Point(0), 'rgba(82,3,10,0.34)', 'Anna'),
+    // new Bot(grid, 40 * 96, new Speed(400, 55), new Point(0), 'rgba(82,3,10,0.34)', 'Nick'),
+    // new Bot(grid, 40 * 96, new Speed(400, 65), new Point(0), 'rgba(82,3,10,0.34)', 'Chrome'),
+    // new Bot(grid, 40 * 96, new Speed(400, 75), new Point(0), 'rgba(82,3,10,0.34)', 'YouTube'),
   ];
   const food = new Food(grid, snake);
+  food.generate(40);
+  // grid.getBlockByXY(7, 15)?.updateAsWall();
+  // grid.getBlockByXY(8, 15)?.updateAsWall();
+  // grid.getBlockByXY(9, 15)?.updateAsWall();
+  // grid.getBlockByXY(10, 15)?.updateAsWall();
+  // grid.getBlockByXY(11, 15)?.updateAsWall();
+  // grid.getBlockByXY(12, 15)?.updateAsWall();
+  // grid.getBlockByXY(13, 15)?.updateAsWall();
+  // grid.getBlockByXY(14, 15)?.updateAsWall();
+  // grid.getBlockByXY(15, 15)?.updateAsWall();
   const game = new Game(grid, snake, gameUI, food, bots);
-  game.setPointsToWin(row * col - 10);
+  game.setPointsToWin(30);
   snake.speed.onBroadcast((delay) => speedValue.innerHTML = Number(1000 / delay).toPrecision(2));
   snake.points.onBroadcast((point) => pointValue.innerHTML = point.toString());
   snake.onBroadcast(({size, stopped}) => {
@@ -180,7 +194,6 @@
       const blocks = dom.querySelector('.length>strong');
 
       alive.innerHTML = 'Alive';
-
       bot.run();
       name.innerText = bot.name;
       bot.speed.onBroadcast((delay) => speed.innerHTML = Number(1000 / delay).toPrecision(2));
@@ -204,6 +217,8 @@
     if (['KeyR'].includes(e.code)) {
       game.reset();
       game.run();
+      bots.map(bot => bot.reset());
+      food.generate(4);
       document.querySelectorAll('.alive>strong').forEach((element) => element.innerHTML = 'Alive')
     }
     if (['Space'].includes(e.code)) snake.increaseSpeed();

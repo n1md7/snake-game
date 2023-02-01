@@ -200,7 +200,7 @@ export class Game {
   }
 
   #handleGameWon() {
-    alert(`Winner is ${this.#actionTarget.name}`)
+    alert(`Winner is ${this.#actionTarget.name}`);
     this.#canvas.showWinner();
   }
 
