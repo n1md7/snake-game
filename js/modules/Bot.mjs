@@ -104,7 +104,7 @@ export class Bot extends Snake {
       if (!block) continue;
       if (block.isFood()) return {row, col, idx: this.#grid.getLinearIdx(row, col)};
       block.updateAsTest();
-      delay(300).then(() => block.resetTest());
+      delay(this.speed.current).then(() => block.resetTest());
       if (this.direction === Direction.Type.Right) {
         Array.prototype.push.apply(stack, [
           {row: row - 1, col: col + 1, level: level + 1},
